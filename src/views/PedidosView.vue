@@ -59,7 +59,17 @@
                       :class="{ 'btn-obs--active': unidad.obs.length > 0 }"
                       @click="abrirPopup(i, j)"
                     >
-                      {{ unidad.obs.length > 0 ? buildObsText(unidad.obs) : 'Observaciones' }}
+                      <template v-if="unidad.obs.length > 0">
+                        <span
+                          v-for="(o, k) in unidad.obs" :key="k"
+                          :class="{
+                            'obs-solo': o.modo === 'Solo',
+                            'obs-no':   o.modo === 'No',
+                            'obs-mas':  o.modo === '+'
+                          }"
+                        >{{ k > 0 ? ', ' : '' }}{{ o.modo === 'Solo' ? 'Solo ' : o.modo === 'No' ? 'No ' : '+ ' }}{{ o.item }}</span>
+                      </template>
+                      <template v-else>Observaciones</template>
                     </button>
 
                   </div>
