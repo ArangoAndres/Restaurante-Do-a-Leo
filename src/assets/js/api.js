@@ -1,5 +1,6 @@
 import axios from "axios";
 
 export const api = axios.create({
-  baseURL: "http://localhost:3000/api/redis",
+  baseURL:
+    "https://restaurante-backend-restaurante.bswr1j.easypanel.host/api/redis",
 });
