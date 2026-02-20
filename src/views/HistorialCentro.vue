@@ -1,57 +1,57 @@
 <template>
   <div class="historial-wrapper">
-
     <div class="pedidos-grid">
 
-      <!-- CARD 1 -->
-      <div class="pedido-card">
+      <div
+        v-for="pedido in pedidos"
+        :key="pedido.id"
+        class="pedido-card"
+      >
         <div class="pedido-card-header">
           <span class="pedido-direccion">
-            Calle 15 # 8-32, Barrio El Prado
+            {{ pedido.cliente?.direccion }}
           </span>
         </div>
 
         <div class="pedido-card-body">
           <div class="pedido-meta">
-            <span class="pedido-hora">🕐 3:45 p. m.</span>
-            <span class="pedido-elapsed">hace 12 min</span>
-          </div>
-        </div>
-      </div>
-
-      <!-- CARD 2 -->
-      <div class="pedido-card">
-        <div class="pedido-card-header">
-          <span class="pedido-direccion">
-            Carrera 10 # 22-15, Centro
-          </span>
-        </div>
-
-        <div class="pedido-card-body">
-          <div class="pedido-meta">
-            <span class="pedido-hora">🕐 2:30 p. m.</span>
-            <span class="pedido-elapsed">hace 1 h 27 min</span>
-          </div>
-        </div>
-      </div>
-
-      <!-- CARD 3 -->
-      <div class="pedido-card">
-        <div class="pedido-card-header">
-          <span class="pedido-direccion">
-            Av. Quebrada Seca # 5-40
-          </span>
-        </div>
-
-        <div class="pedido-card-body">
-          <div class="pedido-meta">
-            <span class="pedido-hora">🕐 1:10 p. m.</span>
-            <span class="pedido-elapsed">hace 2 h 45 min</span>
+            <span class="pedido-hora">
+              🕐 {{ formatHora(pedido.fecha) }}
+            </span>
+            <span class="pedido-elapsed">
+              {{ tiempoTranscurrido(pedido.fecha) }}
+            </span>
           </div>
         </div>
       </div>
 
     </div>
-
   </div>
 </template>
+
+<script setup>
+import { usePedidos } from "../assets/js/Historial.js"
+
+const { pedidos } = usePedidos()
+
+const formatHora = (fecha) => {
+  const date = new Date(fecha)
+  return date.toLocaleTimeString("es-CO", {
+    hour: "2-digit",
+    minute: "2-digit"
+  })
+}
+
+const tiempoTranscurrido = (fecha) => {
+  const diff = Date.now() - new Date(fecha).getTime()
+  const minutos = Math.floor(diff / 60000)
+
+  if (minutos < 1) return "hace segundos"
+  if (minutos < 60) return `hace ${minutos} min`
+
+  const horas = Math.floor(minutos / 60)
+  const resto = minutos % 60
+
+  return `hace ${horas} h ${resto} min`
+}
+</script>

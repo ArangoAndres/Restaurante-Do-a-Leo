@@ -2,7 +2,7 @@ import { ref, reactive } from "vue";
 import { MENU } from "../data/menuData.js";
 import { OBS_POR_PLATO } from "../data/ObservacionesData.js";
 import axios from "axios";
-
+import { api } from "./api.js";
 export { MENU, OBS_POR_PLATO };
 
 function crearUnidad(sizes) {
@@ -161,10 +161,7 @@ export function usePedido() {
     };
 
     try {
-      const response = await axios.post(
-        "http://localhost:3000/api/redis/pedidos",
-        pedido,
-      );
+      const response = await api.post("/pedidos", pedido);
 
       console.log("Respuesta backend:", response.data);
 

@@ -129,8 +129,8 @@
             <span class="rest-name">Restaurante Centro</span>
           </button>
           <button type="button" class="btn-restaurante"
-            :class="{ active: restauranteSeleccionado === 'Bolívar' }"
-            @click="restauranteSeleccionado = 'Bolívar'">
+            :class="{ active: restauranteSeleccionado === 'Bolivar' }"
+            @click="restauranteSeleccionado = 'Bolivar'">
             <span class="rest-icon">🏛</span>
             <span class="rest-name">Restaurante Bolívar</span>
           </button>

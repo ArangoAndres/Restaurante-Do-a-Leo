@@ -1,6 +1,5 @@
 <template>
   <div class="historial-wrapper">
-
     <div class="pedidos-grid">
 
       <div
@@ -11,38 +10,42 @@
       >
         <div class="pedido-card-header">
           <span class="pedido-direccion">
-            {{ pedido.direccion }}
+            {{ pedido.cliente?.direccion }}
           </span>
         </div>
 
         <div class="pedido-card-body">
           <div class="pedido-meta">
-            <span class="pedido-hora">🕐 {{ pedido.hora }}</span>
-            <span class="pedido-elapsed">ver detalle</span>
+            <span class="pedido-hora">
+              🕐 {{ formatHora(pedido.fecha) }}
+            </span>
+            <span class="pedido-elapsed">
+              ver detalle
+            </span>
           </div>
         </div>
       </div>
 
     </div>
-
   </div>
 </template>
 
-
-//!Simulacion de data
 <script setup>
-import { useRouter } from 'vue-router'
+import { useRouter } from "vue-router"
+import { HistorialBolivar } from "../assets/js/Historial_Bolivar.js"
 
 const router = useRouter()
-
-const pedidos = [
-  { id: 1, direccion: 'Calle 15 # 8-32', hora: '3:45 p. m.' },
-  { id: 2, direccion: 'Carrera 10 # 22-15', hora: '2:30 p. m.' },
-  { id: 3, direccion: 'Av. Quebrada Seca # 5-40', hora: '1:10 p. m.' }
-]
+const { pedidos } = HistorialBolivar()
 
 function irADetalle(id) {
   router.push(`/pedido/${id}`)
 }
-</script>
 
+const formatHora = (fecha) => {
+  const date = new Date(fecha)
+  return date.toLocaleTimeString("es-CO", {
+    hour: "2-digit",
+    minute: "2-digit"
+  })
+}
+</script>
