@@ -26,6 +26,7 @@ export function usePedido() {
   const form = reactive({ nombre: "", telefono: "", direccion: "" });
   const recogeEnRestaurante = ref(false);
   const restauranteSeleccionado = ref("");
+  const formaPago = ref(""); // ← NUEVO
   const toastVisible = ref(false);
   const selections = reactive(MENU.map(() => []));
 
@@ -101,6 +102,7 @@ export function usePedido() {
     form.direccion = "";
     recogeEnRestaurante.value = false;
     restauranteSeleccionado.value = "";
+    formaPago.value = ""; // ← NUEVO
     MENU.forEach((_, i) => {
       selections[i] = [];
     });
@@ -118,6 +120,12 @@ export function usePedido() {
 
     if (!recogeEnRestaurante.value && !form.direccion) {
       alert("Por favor ingresa la dirección de entrega.");
+      return;
+    }
+
+    if (!formaPago.value) {
+      // ← NUEVO
+      alert("Por favor selecciona una forma de pago.");
       return;
     }
 
@@ -150,6 +158,11 @@ export function usePedido() {
     const pedido = {
       fecha: ahora,
       restaurante: restauranteSeleccionado.value,
+      formaPago: formaPago.value, // ← NUEVO
+      estado:
+        formaPago.value === "Transferencia"
+          ? "Pago pendiente"
+          : "Pago Efectivo",
       cliente: {
         nombre: form.nombre,
         telefono: form.telefono,
@@ -179,6 +192,7 @@ export function usePedido() {
     form,
     recogeEnRestaurante,
     restauranteSeleccionado,
+    formaPago, // ← NUEVO
     toastVisible,
     selections,
     popup,

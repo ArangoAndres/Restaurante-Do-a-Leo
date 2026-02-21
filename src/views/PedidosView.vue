@@ -120,10 +120,34 @@
       </div>
     </div>
 
-    <!-- SECCIÓN 3: RESTAURANTE DESTINO -->
+    <!-- SECCIÓN 3: FORMA DE PAGO -->
     <div class="section">
       <div class="section-header">
         <div class="section-icon">3</div>
+        <h2>Forma de Pago</h2>
+      </div>
+      <div class="section-body">
+        <div class="grid-2">
+          <button type="button" class="btn-restaurante"
+            :class="{ active: formaPago === 'Efectivo' }"
+            @click="formaPago = 'Efectivo'">
+            <span class="rest-icon">💵</span>
+            <span class="rest-name">Efectivo</span>
+          </button>
+          <button type="button" class="btn-restaurante"
+            :class="{ active: formaPago === 'Transferencia' }"
+            @click="formaPago = 'Transferencia'">
+            <span class="rest-icon">📲</span>
+            <span class="rest-name">Transferencia</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- SECCIÓN 4: RESTAURANTE DESTINO -->
+    <div class="section">
+      <div class="section-header">
+        <div class="section-icon">4</div>
         <h2>Restaurante Destino</h2>
       </div>
       <div class="section-body">
@@ -249,6 +273,7 @@ const {
   form,
   recogeEnRestaurante,
   restauranteSeleccionado,
+  formaPago,
   toastVisible,
   selections,
   popup,

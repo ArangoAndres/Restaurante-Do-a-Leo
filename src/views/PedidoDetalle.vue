@@ -1,11 +1,15 @@
 <script setup>
+import { computed } from "vue";
 import { DetallePedido } from "../assets/js/detallePedido.js";
+import { actualizarEstadoPago } from "../assets/js/actualizarEstadoPago.js";
+import { cancelarPedido } from "../assets/js/cancelarPedido.js";
+
 function volver() {
   window.history.back();
 }
+
 const formatearObservaciones = (observaciones) => {
   if (!observaciones || !observaciones.length) return "";
-
   return observaciones
     .map(o => {
       if (o.modo === "+") return `Más ${o.item}`;
@@ -14,10 +18,9 @@ const formatearObservaciones = (observaciones) => {
     })
     .join(", ");
 };
-const {
-  pedido,
 
-} = DetallePedido();
+const { pedido } = DetallePedido();
+
 const formatHora = (fecha) => {
   const date = new Date(fecha);
   return date.toLocaleTimeString("es-CO", {
@@ -25,9 +28,21 @@ const formatHora = (fecha) => {
     minute: "2-digit"
   });
 };
+
+const marcarComoPagado = async () => {
+  try {
+    await actualizarEstadoPago(pedido.value.id);
+    window.location.reload();
+  } catch (error) {
+    console.error(error);
+    alert("No se pudo actualizar el estado");
+  }
+};
+
+const cancelar = computed(() =>
+  pedido.value ? cancelarPedido(pedido.value.id) : null
+);
 </script>
-
-
 
 <template>
   <div class="detalle-wrapper">
@@ -46,25 +61,67 @@ const formatHora = (fecha) => {
         <p><strong>Nombre:</strong> {{ pedido.cliente.nombre }}</p>
         <p><strong>Celular:</strong> {{ pedido.cliente.telefono }}</p>
         <p><strong>Dirección:</strong> {{ pedido.cliente.direccion }}</p>
+        <p><strong>Forma Pago:</strong> {{ pedido.formaPago }}</p>
+        <p>
+          <strong>Estado:</strong>
+          {{ pedido.estado }}
+          <button
+            v-if="pedido.estado === 'Pago pendiente'"
+            class="btn-pago-realizado"
+            @click="marcarComoPagado"
+          >
+            Pago realizado
+          </button>
+        </p>
       </div>
 
       <div class="factura-platos">
         <h3>Platos</h3>
         <ul>
           <li v-for="(plato, index) in pedido.platos" :key="index">
-  {{ plato.nombre }} - {{ plato.size }}
-
-  <span v-if="plato.observaciones?.length">
-  {{ formatearObservaciones(plato.observaciones) }}
-</span>
-</li>
+            {{ plato.nombre }} - {{ plato.size }}
+            <span v-if="plato.observaciones?.length">
+              {{ formatearObservaciones(plato.observaciones) }}
+            </span>
+          </li>
         </ul>
+      </div>
+
+      <div class="factura-acciones">
+       <button class="btn-editar" @click="$router.push(`/pedidos/${pedido.id}/editar`)">
+  ✏️ Editar Pedido
+</button>
+        <button class="btn-cancelar" @click="cancelar.abrirConfirmacion()">
+          ✕ Cancelar Pedido
+        </button>
       </div>
 
     </div>
 
-    <div v-else>
-      Cargando pedido...
+    <div v-else>Cargando pedido...</div>
+
+    <!-- POPUP CONFIRMACIÓN -->
+    <div class="popup-overlay" v-if="cancelar?.mostrarConfirmacion.value">
+      <div class="popup">
+        <div class="popup-header">
+          <h3>Cancelar Pedido</h3>
+          <span class="popup-plato">Esta acción no se puede deshacer</span>
+        </div>
+        <div class="popup-body">
+          <p style="font-size: .95rem; color: #333;">
+            ¿Estás seguro de que deseas cancelar el pedido <strong>#{{ pedido?.id }}</strong>?
+          </p>
+        </div>
+        <div class="popup-footer">
+          <button class="btn-reset" @click="cancelar.cerrarConfirmacion()">
+            No, volver
+          </button>
+          <button class="btn-cancelar" @click="cancelar.confirmarCancelacion()">
+            Sí, cancelar
+          </button>
+        </div>
+      </div>
     </div>
+
   </div>
 </template>
