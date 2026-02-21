@@ -29,15 +29,21 @@
               </td>
 
               <td>
-                <input
-                  type="number"
-                  class="qty"
-                  placeholder="0"
-                  min="0"
-                  max="99"
-                  :value="selections[i].length || ''"
-                  @change="updateQty(i, $event.target.value)"
-                />
+                <div class="qty-counter">
+                  <button
+                    type="button"
+                    class="qty-btn qty-btn--minus"
+                    @click="updateQty(i, selections[i].length - 1)"
+                    :disabled="selections[i].length === 0"
+                  >−</button>
+                  <span class="qty-value">{{ selections[i].length }}</span>
+                  <button
+                    type="button"
+                    class="qty-btn qty-btn--plus"
+                    @click="updateQty(i, selections[i].length + 1)"
+                    :disabled="selections[i].length >= 99"
+                  >+</button>
+                </div>
               </td>
 
               <td class="units-cell">

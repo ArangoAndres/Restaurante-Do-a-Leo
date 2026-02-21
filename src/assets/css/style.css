@@ -116,6 +116,7 @@ header h1 {
   align-self: center;
 }
 
+
 /* SECTIONS */
 .section {
   background: var(--white);
@@ -242,23 +243,55 @@ table.menu-table {
   margin-right: 4px;
 }
 
-/* Quantity */
-input.qty {
-  width: 52px;
-  border: 1.5px solid var(--gray-border);
-  border-radius: 3px;
-  padding: 5px 6px;
-  font-family: 'DM Sans', sans-serif;
-  font-size: .88rem;
-  text-align: center;
+/* Quantity counter */
+.qty-counter {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
   background: var(--gray-light);
-  color: var(--black);
-  outline: none;
-  display: block;
+  border: 1.5px solid var(--gray-border);
+  border-radius: 8px;
+  overflow: hidden;
+  width: fit-content;
   margin: 0 auto;
-  transition: border-color .2s, background .2s;
 }
-input.qty:focus { border-color: var(--yellow-dark); background: #fff; }
+.qty-btn {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 1.1rem;
+  font-weight: 700;
+  width: 32px;
+  height: 32px;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background .15s, opacity .15s;
+  flex-shrink: 0;
+}
+.qty-btn:disabled { opacity: .35; cursor: not-allowed; }
+.qty-btn--minus {
+  background: #e53935;
+  color: white;
+  border-radius: 6px 0 0 6px;
+}
+.qty-btn--minus:not(:disabled):hover { background: #c62828; }
+.qty-btn--plus {
+  background: #1a6e3e;
+  color: white;
+  border-radius: 0 6px 6px 0;
+}
+.qty-btn--plus:not(:disabled):hover { background: #0d3d22; }
+.qty-value {
+  font-family: 'DM Sans', sans-serif;
+  font-size: .95rem;
+  font-weight: 700;
+  color: var(--black);
+  min-width: 32px;
+  text-align: center;
+  user-select: none;
+}
 
 /* Observation */
 input.obs {
@@ -839,8 +872,8 @@ input.obs:focus { border-color: var(--yellow-dark); background: #fff; }
 
 /* + → verde */
 .modo-mas.active {
-  background: #0cdf5d;
-  border-color: #1a6e3e;
+  background: #1a6e3e;
+  border-color: #0d3d22;
   color: #ffffff;
 }
 .modo-mas:not(:disabled):hover { border-color: #1a6e3e; }
