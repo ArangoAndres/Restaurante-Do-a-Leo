@@ -1,88 +1,149 @@
-/* WRAPPER GENERAL */
+/* WRAPPER */
 .historial-wrapper {
   width: 100%;
   min-height: 100vh;
   padding: 50px 70px;
-  background: #ECE9E1; /* más cálido y elegante */
+  background: #ECE9E1;
 }
+
 .clickable {
   cursor: pointer;
 }
-
 .clickable:active {
   transform: scale(.98);
 }
 
-/* GRID DASHBOARD */
+/* GRID */
 .pedidos-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
-  gap: 32px;
+  grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+  gap: 28px;
   width: 100%;
 }
 
 /* CARD */
 .pedido-card {
-  border: 1px solid #E0DDD0; /* menos agresivo */
+  border: 1px solid #E0DDD0;
   border-radius: 16px;
   overflow: hidden;
-  background: var(--white);
-  min-height: 180px;
+  background: #fff;
   display: flex;
   flex-direction: column;
   transition: transform .2s ease, box-shadow .25s ease;
-  box-shadow: 0 6px 18px rgba(0,0,0,0.06);
+  box-shadow: 0 4px 14px rgba(0,0,0,0.07);
 }
 
 .pedido-card:hover {
-  transform: translateY(-6px);
-  box-shadow: 0 14px 30px rgba(0,0,0,0.12);
+  transform: translateY(-5px);
+  box-shadow: 0 12px 28px rgba(0,0,0,0.11);
 }
 
 /* HEADER */
 .pedido-card-header {
-  background: #FFF7CC; /* amarillo suave */
+  background: #FFF7CC;
   border-bottom: 1px solid #E6DFAF;
-  padding: 20px 24px;
+  padding: 14px 20px;
 }
 
 .pedido-direccion {
-  font-weight: 700;
-  font-size: 1.1rem;
-  color: var(--black);
-  letter-spacing: .3px;
+  font-weight: 800;
+  font-size: 1.05rem;
+  color: #1a1a1a;
+  letter-spacing: .2px;
 }
 
 /* BODY */
 .pedido-card-body {
   flex: 1;
-  padding: 24px;
+  padding: 16px 20px;
   display: flex;
-  align-items: center;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 14px;
 }
 
-/* META INFO */
-.pedido-meta {
-  width: 100%;
+/* TOP */
+.pedido-top {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.pedido-left {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.cliente-nombre {
+  font-size: .95rem;
+  font-weight: 700;
+  color: black;
+}
+.cliente-telefono {
+  font-size: .95rem;
+  font-weight: 700;
+  color: black;
+  margin-left: 6px;
+}
+
+.pago-info {
+  font-size: .88rem;
+  color: black;
+}
+
+.estado-pendiente {
+  color: #9a7000;
+  font-weight: 600;
+}
+
+/* BOTTOM */
+.pedido-bottom {
   display: flex;
   justify-content: space-between;
   align-items: center;
 }
 
-/* HORA */
-.pedido-hora {
-  font-size: 1.05rem;
-  font-weight: 600;
-  color: var(--black);
+.pedido-tiempo {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
 }
 
-/* ELAPSED BADGE */
-.pedido-elapsed {
-  font-size: .8rem;
+.pedido-hora {
+  font-size: .9rem;
+  font-weight: 500;
+  color: black;
+}
+
+.pedido-hace {
+  display: inline-block;
+  font-size: .88rem;
+  font-weight: 800;
+  color: black;
+  background: #FFF3AA;
+  border: 1.5px solid #D4C060;
+  border-radius: 20px;
+  padding: 5px 14px;
+  width: fit-content;
+  
+}
+
+/* BOTÓN VER DETALLE */
+.btn-detalle {
+  font-size: .82rem;
   font-weight: 600;
-  color: #6B6B6B;
   background: #F4F1E8;
   border: 1px solid #DDD8C4;
   border-radius: 30px;
   padding: 7px 16px;
+  color: #5E5A4F;
+  cursor: pointer;
+  transition: background .2s ease, border-color .2s ease;
+  white-space: nowrap;
+}
+
+.btn-detalle:hover {
+  background: #EDE8D8;
+  border-color: #C8C2A8;
 }

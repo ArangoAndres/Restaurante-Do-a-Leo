@@ -2,7 +2,7 @@
 import { useEditarPedidoReady } from "../assets/js/esperarPedido.js";
 import { MENU, OBS_POR_PLATO } from "../assets/js/userPedido.js";
 
-const { pedido, logica, loading } = useEditarPedidoReady();
+const { pedido, logica, loading, selections } = useEditarPedidoReady();
 
 function volver() {
   window.history.back();
@@ -40,104 +40,104 @@ function volver() {
               <td colspan="3">{{ item.cat }}</td>
             </tr>
 
-            <tr v-else-if="logica.selections?.[i]" class="dish-row">
-  <td class="dish-name">
-    <span v-if="item.num" class="dish-num">{{ item.num }}.</span>
-    {{ item.name }}
-  </td>
+            <tr v-else-if="selections[i]" class="dish-row">
+              <td class="dish-name">
+                <span v-if="item.num" class="dish-num">{{ item.num }}.</span>
+                {{ item.name }}
+              </td>
 
-  <td>
-    <div class="qty-counter">
-      <button
-        type="button"
-        class="qty-btn qty-btn--minus"
-        @click="logica.updateQty(i, logica.selections[i].length - 1)"
-        :disabled="logica.selections[i].length === 0"
-      >
-        −
-      </button>
+              <td>
+                <div class="qty-counter">
+                  <button
+                    type="button"
+                    class="qty-btn qty-btn--minus"
+                    @click="logica.updateQty(i, selections[i].length - 1)"
+                    :disabled="selections[i].length === 0"
+                  >
+                    −
+                  </button>
 
-      <span class="qty-value">
-        {{ logica.selections[i].length }}
-      </span>
+                  <span class="qty-value">
+                    {{ selections[i].length }}
+                  </span>
 
-      <button
-        type="button"
-        class="qty-btn qty-btn--plus"
-        @click="logica.updateQty(i, logica.selections[i].length + 1)"
-        :disabled="logica.selections[i].length >= 99"
-      >
-        +
-      </button>
-    </div>
-  </td>
+                  <button
+                    type="button"
+                    class="qty-btn qty-btn--plus"
+                    @click="logica.updateQty(i, selections[i].length + 1)"
+                    :disabled="selections[i].length >= 99"
+                  >
+                    +
+                  </button>
+                </div>
+              </td>
 
-  <td class="units-cell">
-    <div
-      v-if="logica.selections[i].length > 0"
-      class="units-wrapper"
-    >
-      <div
-        v-for="(unidad, j) in logica.selections[i]"
-        :key="j"
-        class="unit-row"
-      >
-        <span
-          v-if="logica.selections[i].length > 1"
-          class="unit-label"
-        >
-          {{ j + 1 }}.
-        </span>
+              <td class="units-cell">
+                <div
+                  v-if="selections[i].length > 0"
+                  class="units-wrapper"
+                >
+                  <div
+                    v-for="(unidad, j) in selections[i]"
+                    :key="j"
+                    class="unit-row"
+                  >
+                    <span
+                      v-if="selections[i].length > 1"
+                      class="unit-label"
+                    >
+                      {{ j + 1 }}.
+                    </span>
 
-        <select
-          v-if="item.sizes?.length > 0"
-          class="unit-size"
-          v-model="unidad.size"
-        >
-          <option
-            v-for="s in item.sizes"
-            :key="s"
-            :value="s"
-          >
-            {{ s }}
-          </option>
-        </select>
+                    <select
+                      v-if="item.sizes?.length > 0"
+                      class="unit-size"
+                      v-model="unidad.size"
+                    >
+                      <option
+                        v-for="s in item.sizes"
+                        :key="s"
+                        :value="s"
+                      >
+                        {{ s }}
+                      </option>
+                    </select>
 
-        <button
-          v-if="OBS_POR_PLATO[item.num]"
-          type="button"
-          class="btn-obs"
-          :class="{ 'btn-obs--active': unidad.obs.length > 0 }"
-          @click="logica.abrirPopup(i, j)"
-        >
-          <template v-if="unidad.obs.length > 0">
-            <span
-              v-for="(o, k) in unidad.obs"
-              :key="k"
-              :class="{
-                'obs-solo': o.modo === 'Solo',
-                'obs-no': o.modo === 'No',
-                'obs-mas': o.modo === '+'
-              }"
-            >
-              {{ k > 0 ? ', ' : '' }}
-              {{ o.modo === 'Solo'
-                  ? 'Solo '
-                  : o.modo === 'No'
-                  ? 'No '
-                  : '+ ' }}
-              {{ o.item }}
-            </span>
-          </template>
+                    <button
+                      v-if="OBS_POR_PLATO[item.num]"
+                      type="button"
+                      class="btn-obs"
+                      :class="{ 'btn-obs--active': unidad.obs.length > 0 }"
+                      @click="logica.abrirPopup(i, j)"
+                    >
+                      <template v-if="unidad.obs.length > 0">
+                        <span
+                          v-for="(o, k) in unidad.obs"
+                          :key="k"
+                          :class="{
+                            'obs-solo': o.modo === 'Solo',
+                            'obs-no': o.modo === 'No',
+                            'obs-mas': o.modo === '+'
+                          }"
+                        >
+                          {{ k > 0 ? ', ' : '' }}
+                          {{ o.modo === 'Solo'
+                              ? 'Solo '
+                              : o.modo === 'No'
+                              ? 'No '
+                              : '+ ' }}
+                          {{ o.item }}
+                        </span>
+                      </template>
 
-          <template v-else>
-            Observaciones
-          </template>
-        </button>
-      </div>
-    </div>
-  </td>
-</tr>
+                      <template v-else>
+                        Observaciones
+                      </template>
+                    </button>
+                  </div>
+                </div>
+              </td>
+            </tr>
 
           </template>
         </tbody>
@@ -184,25 +184,25 @@ function volver() {
       </div>
       <div class="section-body">
         <div class="grid-2">
-         <button
-  type="button"
-  class="btn-restaurante"
-  :class="{ active: logica.formaPago === 'Efectivo' }"
-  @click="logica.formaPago = 'Efectivo'"
->
-  <span class="rest-icon">💵</span>
-  <span class="rest-name">Efectivo</span>
-</button>
+          <button
+            type="button"
+            class="btn-restaurante"
+            :class="{ active: logica.formaPago.value === 'Efectivo' }"
+            @click="logica.formaPago.value = 'Efectivo'"
+          >
+            <span class="rest-icon">💵</span>
+            <span class="rest-name">Efectivo</span>
+          </button>
 
-<button
-  type="button"
-  class="btn-restaurante"
-  :class="{ active: logica.formaPago === 'Transferencia' }"
-  @click="logica.formaPago = 'Transferencia'"
->
-  <span class="rest-icon">📲</span>
-  <span class="rest-name">Transferencia</span>
-</button>
+          <button
+            type="button"
+            class="btn-restaurante"
+            :class="{ active: logica.formaPago.value === 'Transferencia' }"
+            @click="logica.formaPago.value = 'Transferencia'"
+          >
+            <span class="rest-icon">📲</span>
+            <span class="rest-name">Transferencia</span>
+          </button>
         </div>
       </div>
     </div>
@@ -230,7 +230,8 @@ function volver() {
         <h3>Observaciones</h3>
         <span v-if="logica.popup.itemIndex !== null" class="popup-plato">
           {{ MENU[logica.popup.itemIndex].name }}
-          <template v-if="logica.selections.value[logica.popup.itemIndex]?.length > 1">
+          <!-- ✅ CORREGIDO: usa selections del computed -->
+          <template v-if="selections[logica.popup.itemIndex]?.length > 1">
             — Unidad {{ logica.popup.unitIndex + 1 }}
           </template>
         </span>

@@ -26,6 +26,10 @@ const router = createRouter({
       path: "/pedidos/:id/editar",
       component: () => import("../views/EditarPedido.vue"),
     },
+    {
+      path: "/pedidos/centro/editar",
+      component: () => import("../views/Centro_Editar.vue"),
+    },
   ],
 });
 

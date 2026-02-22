@@ -1,5 +1,5 @@
 <script setup>
-import { computed } from "vue";
+import { computed, ref } from "vue";
 import { DetallePedido } from "../assets/js/detallePedido.js";
 import { actualizarEstadoPago } from "../assets/js/actualizarEstadoPago.js";
 import { cancelarPedido } from "../assets/js/cancelarPedido.js";
@@ -29,9 +29,21 @@ const formatHora = (fecha) => {
   });
 };
 
-const marcarComoPagado = async () => {
+// ── POPUP CONFIRMAR PAGO ──────────────────────────────────────
+const mostrarConfirmacionPago = ref(false);
+
+const abrirConfirmacionPago = () => {
+  mostrarConfirmacionPago.value = true;
+};
+
+const cerrarConfirmacionPago = () => {
+  mostrarConfirmacionPago.value = false;
+};
+
+const confirmarPago = async () => {
   try {
     await actualizarEstadoPago(pedido.value.id);
+    cerrarConfirmacionPago();
     window.location.reload();
   } catch (error) {
     console.error(error);
@@ -39,6 +51,7 @@ const marcarComoPagado = async () => {
   }
 };
 
+// ── CANCELAR PEDIDO ───────────────────────────────────────────
 const cancelar = computed(() =>
   pedido.value ? cancelarPedido(pedido.value.id) : null
 );
@@ -68,9 +81,9 @@ const cancelar = computed(() =>
           <button
             v-if="pedido.estado === 'Pago pendiente'"
             class="btn-pago-realizado"
-            @click="marcarComoPagado"
+            @click="abrirConfirmacionPago"
           >
-            Pago realizado
+            ¿Pago realizado?
           </button>
         </p>
       </div>
@@ -88,9 +101,9 @@ const cancelar = computed(() =>
       </div>
 
       <div class="factura-acciones">
-       <button class="btn-editar" @click="$router.push(`/pedidos/${pedido.id}/editar`)">
-  ✏️ Editar Pedido
-</button>
+        <button class="btn-editar" @click="$router.push(`/pedidos/${pedido.id}/editar`)">
+          ✏️ Editar Pedido
+        </button>
         <button class="btn-cancelar" @click="cancelar.abrirConfirmacion()">
           ✕ Cancelar Pedido
         </button>
@@ -100,8 +113,31 @@ const cancelar = computed(() =>
 
     <div v-else>Cargando pedido...</div>
 
-    <!-- POPUP CONFIRMACIÓN -->
-    <div class="popup-overlay" v-if="cancelar?.mostrarConfirmacion.value">
+    <!-- POPUP CONFIRMAR PAGO -->
+    <div class="popup-overlay" v-if="mostrarConfirmacionPago" @click.self="cerrarConfirmacionPago">
+      <div class="popup">
+        <div class="popup-header">
+          <h3>Confirmar Pago</h3>
+          <span class="popup-plato">Pedido #{{ pedido?.id }}</span>
+        </div>
+        <div class="popup-body">
+          <p style="font-size: .95rem; color: #333;">
+            ¿Confirmas que el pago por <strong>transferencia</strong> fue recibido?
+          </p>
+        </div>
+        <div class="popup-footer">
+          <button class="btn-reset" @click="cerrarConfirmacionPago">
+            No, volver
+          </button>
+          <button class="btn-submit" @click="confirmarPago">
+            Sí, confirmar
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- POPUP CANCELAR PEDIDO -->
+    <div class="popup-overlay" v-if="cancelar?.mostrarConfirmacion.value" @click.self="cancelar.cerrarConfirmacion()">
       <div class="popup">
         <div class="popup-header">
           <h3>Cancelar Pedido</h3>

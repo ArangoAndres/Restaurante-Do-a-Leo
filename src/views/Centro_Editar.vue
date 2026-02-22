@@ -5,7 +5,8 @@
       <div
         v-for="pedido in pedidos"
         :key="pedido.id"
-        class="pedido-card"
+        class="pedido-card clickable"
+        @click="irADetalle(pedido.id)"
       >
         <div class="pedido-card-header">
           <span class="pedido-direccion">
@@ -20,7 +21,7 @@
             <div class="pedido-left">
               <div class="cliente-nombre">
                 {{ pedido.cliente?.nombre }}
-                <span class="cliente-telefono">Cel: {{ pedido.cliente?.telefono }}</span>
+                <span class="cliente-telefono">{{ pedido.cliente?.telefono }}</span>
               </div>
               <div class="pago-info">
                 {{ pedido.formaPago }}
@@ -31,12 +32,15 @@
             </div>
           </div>
 
-          <!-- FILA 2: Hora + Tiempo transcurrido -->
+          <!-- FILA 2: Hora + Tiempo transcurrido + Ver detalle -->
           <div class="pedido-bottom">
             <div class="pedido-tiempo">
               <span class="pedido-hora">🕐 {{ formatHora(pedido.fecha) }}</span>
               <span class="pedido-hace">{{ tiempoTranscurrido(pedido.fecha) }}</span>
             </div>
+            <button class="btn-detalle" @click.stop="irADetalle(pedido.id)">
+              ver detalle
+            </button>
           </div>
 
         </div>
@@ -47,9 +51,15 @@
 </template>
 
 <script setup>
-import { usePedidos } from "../assets/js/Historial.js"
+import { useRouter } from "vue-router"
+import { Edit_centro } from "../assets/js/Centro_Editar.js"
 
-const { pedidos } = usePedidos()
+const router = useRouter()
+const { pedidos } = Edit_centro()
+
+function irADetalle(id) {
+  router.push(`/pedido/${id}`)
+}
 
 const formatHora = (fecha) => {
   const date = new Date(fecha)
@@ -70,5 +80,15 @@ const tiempoTranscurrido = (fecha) => {
   const resto = minutos % 60
 
   return `hace ${horas} h ${resto > 0 ? resto + ' min' : ''}`
+}
+
+async function listarImpresoras() {
+  try {
+    if (!qz.websocket.isActive()) await qz.websocket.connect()
+    const printers = await qz.printers.find()
+    console.log("Impresoras detectadas:", printers)
+  } catch (err) {
+    console.error(err)
+  }
 }
 </script>

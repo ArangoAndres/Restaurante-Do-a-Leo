@@ -26,9 +26,9 @@
 
     <h1>{{ pageTitle }}</h1>
 
-    <div class="logo">
-      <img src="/icon_doñaleo.png" class="logo_img" />
-    </div>
+    <div class="logo" @click="$router.push('/pedidos/centro/editar')" style="cursor:pointer">
+  <img src="/icon_doñaleo.png" class="logo_img" />
+</div>
   </header>
 </template>
 

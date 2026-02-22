@@ -232,8 +232,8 @@ table.menu-table {
 .dish-row:hover { background: #fffbe6; }
 
 .dish-name {
-  font-size: .9rem;
-  font-weight: 500;
+  font-size: 1rem;
+  font-weight: bold;
   color: var(--black);
 }
 .dish-num {
