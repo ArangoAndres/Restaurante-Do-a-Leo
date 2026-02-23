@@ -82,17 +82,6 @@ const tiempoTranscurrido = (fecha) => {
 ============================ */
 
 async function conectarQZ() {
-  qz.security.setCertificatePromise(function(resolve) {
-    resolve('-----BEGIN CERTIFICATE-----\nMIIEIjANBgkqhkiG9w0BAQEFAAOCAQ8A\n-----END CERTIFICATE-----')
-  })
-
-  qz.security.setSignatureAlgorithm("SHA512")
-  qz.security.setSignaturePromise(function(toSign) {
-    return function(resolve) {
-      resolve('') // sin firma real
-    }
-  })
-
   if (!qz.websocket.isActive()) {
     await qz.websocket.connect()
   }
