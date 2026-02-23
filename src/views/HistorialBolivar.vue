@@ -96,6 +96,7 @@ function buildTicket(pedido) {
   const LETRA_NORMAL = ESC + '!' + '\x00'
   const CORTE = GS + 'V' + '\x41' + '\x00'
 
+  let ticket = ""
    ticket += LETRA_GRANDE
   ticket += "NUEVO PEDIDO\n"
   ticket += "--------------------------------\n"
