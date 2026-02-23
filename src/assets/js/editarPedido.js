@@ -112,10 +112,19 @@ export const useEditarPedido = (pedido) => {
       return;
     }
 
+    // 🔥 NUEVA LÓGICA DE ESTADO SEGÚN FORMA DE PAGO
+    let nuevoEstado;
+
+    if (form.formaPago === "Efectivo") {
+      nuevoEstado = "Pagado";
+    } else {
+      nuevoEstado = "Pago pendiente";
+    }
+
     const payload = {
       restaurante: pedido.restaurante,
-      formaPago: form.formaPago, // ← desde form
-      estado: pedido.estado,
+      formaPago: form.formaPago,
+      estado: nuevoEstado, // ← ahora sí se recalcula
       cliente: {
         nombre: form.nombre,
         telefono: form.telefono,

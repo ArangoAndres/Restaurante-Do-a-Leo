@@ -1,6 +1,6 @@
 <template>
   <header>
-    <div class="hamburger" @click="toggleMenu">
+   <div class="hamburger" v-if="route.path !== '/historial-centro'" @click="toggleMenu">
       <span></span>
       <span></span>
       <span></span>
@@ -26,7 +26,10 @@
 
     <h1>{{ pageTitle }}</h1>
 
-    <div class="logo" @click="$router.push('/pedidos/centro/editar')" style="cursor:pointer">
+    <div class="logo" 
+  @click="route.path !== '/historial-centro' && $router.push('/pedidos/centro/editar')" 
+  :style="route.path !== '/historial-centro' ? 'cursor:pointer' : 'cursor:default'"
+>
   <img src="/icon_doñaleo.png" class="logo_img" />
 </div>
   </header>

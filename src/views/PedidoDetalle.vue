@@ -55,6 +55,7 @@ const confirmarPago = async () => {
 const cancelar = computed(() =>
   pedido.value ? cancelarPedido(pedido.value.id) : null
 );
+
 </script>
 
 <template>
@@ -79,7 +80,7 @@ const cancelar = computed(() =>
           <strong>Estado:</strong>
           {{ pedido.estado }}
           <button
-            v-if="pedido.estado === 'Pago pendiente'"
+           v-if="pedido.estado === 'Pago pendiente' && pedido.formaPago === 'Transferencia'"
             class="btn-pago-realizado"
             @click="abrirConfirmacionPago"
           >

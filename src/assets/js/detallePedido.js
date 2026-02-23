@@ -15,7 +15,6 @@ export function DetallePedido() {
 
     try {
       const { id } = route.params;
-
       const { data } = await api.get(`/pedidos/bolivar/${id}`);
       pedido.value = data;
     } catch (err) {
