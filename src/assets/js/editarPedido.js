@@ -3,19 +3,19 @@ import { api } from "./api.js";
 import { MENU, OBS_POR_PLATO } from "./userPedido.js";
 
 export const useEditarPedido = (pedido) => {
-  // ── FORM DEL CLIENTE ──────────────────────────────────────────
+  // ── FORM DEL CLIENTE ───────────────────────────────
   const form = reactive({
     nombre: pedido.cliente.nombre,
     telefono: pedido.cliente.telefono,
     direccion: pedido.cliente.direccion,
-    formaPago: pedido.formaPago ?? "Efectivo", // ← movido aquí
+    formaPago: pedido.formaPago ?? "Efectivo",
   });
 
   const recogeEnRestaurante = ref(
     !pedido.cliente.direccion || pedido.cliente.direccion.trim() === "",
   );
 
-  // ── SELECTIONS ─────────────────────────────────────────────────
+  // ── SELECTIONS ─────────────────────────────────────
   const selections = ref(
     MENU.map((item) => {
       if (item.cat) return [];
@@ -24,34 +24,52 @@ export const useEditarPedido = (pedido) => {
 
       return platosDelMenu.map((p) => ({
         size: p.size || (item.sizes?.[0] ?? ""),
-        obs: Array.isArray(p.observaciones) ? p.observaciones : [],
+        obs: {
+          radios: p.observaciones?.radios ?? [],
+          modos: p.observaciones?.modos ?? {},
+          selectores: p.observaciones?.selectores ?? {},
+          texto: p.observaciones?.texto ?? "",
+        },
       }));
     }),
   );
 
-  // ── POPUP OBSERVACIONES ───────────────────────────────────────
+  // ── POPUP OBSERVACIONES ────────────────────────────
   const popup = reactive({
     visible: false,
     itemIndex: null,
     unitIndex: null,
-    temp: {},
+    temp: { radios: [], modos: {}, selectores: {}, texto: "" },
   });
 
-  const haySolo = () => Object.values(popup.temp).some((v) => v === "Solo");
+  // Helpers
+  const haySolo = () =>
+    Object.values(popup.temp.modos).some((v) => v === "Solo");
 
-  const toggleModo = (obs, modo) => {
+  const toggleRadio = (label) => {
+    const radios = popup.temp.radios;
+    if (radios.includes(label)) {
+      popup.temp.radios = radios.filter((r) => r !== label);
+    } else {
+      popup.temp.radios.push(label);
+    }
+  };
+
+  const toggleModo = (label, modo) => {
     if (modo !== "Solo" && haySolo()) return;
-    popup.temp[obs] = popup.temp[obs] === modo ? null : modo;
+    popup.temp.modos[label] = popup.temp.modos[label] === modo ? null : modo;
+  };
+
+  const toggleSelector = (label, value) => {
+    popup.temp.selectores[label] =
+      popup.temp.selectores[label] === value ? null : value;
   };
 
   const abrirPopup = (itemIndex, unitIndex) => {
     popup.itemIndex = itemIndex;
     popup.unitIndex = unitIndex;
-    const obsActuales = selections.value[itemIndex][unitIndex].obs;
-    popup.temp = {};
-    obsActuales.forEach((o) => {
-      popup.temp[o.item] = o.modo;
-    });
+    const obs = selections.value[itemIndex][unitIndex].obs;
+    popup.temp = JSON.parse(JSON.stringify(obs));
     popup.visible = true;
   };
 
@@ -59,40 +77,41 @@ export const useEditarPedido = (pedido) => {
     popup.visible = false;
     popup.itemIndex = null;
     popup.unitIndex = null;
-    popup.temp = {};
+    popup.temp = { radios: [], modos: {}, selectores: {}, texto: "" };
   };
 
   const confirmarPopup = () => {
-    const nuevasObs = Object.entries(popup.temp)
-      .filter(([, modo]) => modo)
-      .map(([item, modo]) => ({ item, modo }));
-    selections.value[popup.itemIndex][popup.unitIndex].obs = nuevasObs;
+    selections.value[popup.itemIndex][popup.unitIndex].obs = JSON.parse(
+      JSON.stringify(popup.temp),
+    );
     cerrarPopup();
   };
 
-  // ── CANTIDAD ──────────────────────────────────────────────────
+  // ── CANTIDAD ───────────────────────────────────────
   const updateQty = (itemIndex, newQty) => {
     const item = MENU[itemIndex];
     const current = selections.value[itemIndex];
 
     if (newQty > current.length) {
       for (let i = current.length; i < newQty; i++) {
-        current.push({ size: item.sizes?.[0] ?? "", obs: [] });
+        current.push({
+          size: item.sizes?.[0] ?? "",
+          obs: { radios: [], modos: {}, selectores: {}, texto: "" },
+        });
       }
     } else {
       current.splice(newQty);
     }
   };
 
-  // ── TOAST ─────────────────────────────────────────────────────
+  // ── TOAST ──────────────────────────────────────────
   const toastVisible = ref(false);
-
   const showToast = () => {
     toastVisible.value = true;
     setTimeout(() => (toastVisible.value = false), 2500);
   };
 
-  // ── ENVIAR ────────────────────────────────────────────────────
+  // ── GUARDAR CAMBIOS ────────────────────────────────
   const guardarCambios = async () => {
     const platos = [];
 
@@ -112,19 +131,13 @@ export const useEditarPedido = (pedido) => {
       return;
     }
 
-    // 🔥 NUEVA LÓGICA DE ESTADO SEGÚN FORMA DE PAGO
-    let nuevoEstado;
-
-    if (form.formaPago === "Efectivo") {
-      nuevoEstado = "Pagado";
-    } else {
-      nuevoEstado = "Pago pendiente";
-    }
+    const nuevoEstado =
+      form.formaPago === "Efectivo" ? "Pagado" : "Pago pendiente";
 
     const payload = {
       restaurante: pedido.restaurante,
       formaPago: form.formaPago,
-      estado: nuevoEstado, // ← ahora sí se recalcula
+      estado: nuevoEstado,
       cliente: {
         nombre: form.nombre,
         telefono: form.telefono,
@@ -143,6 +156,30 @@ export const useEditarPedido = (pedido) => {
     }
   };
 
+  // ── UTILIDADES PARA MOSTRAR OBS EN BOTÓN ───────────
+  const tieneObs = (obs) => {
+    return (
+      (obs.radios && obs.radios.length) ||
+      Object.keys(obs.modos || {}).length ||
+      Object.keys(obs.selectores || {}).length ||
+      (obs.texto && obs.texto.trim() !== "")
+    );
+  };
+
+  const buildObsText = (obs) => {
+    const parts = [];
+    if (obs.radios?.length) parts.push(obs.radios.join(", "));
+    if (obs.modos && Object.keys(obs.modos).length)
+      Object.entries(obs.modos).forEach(([k, v]) => {
+        if (v)
+          parts.push(
+            `${v === "Solo" ? "Solo " : v === "No" ? "No " : "+ "}${k}`,
+          );
+      });
+    if (obs.texto) parts.push(obs.texto);
+    return parts.join(", ");
+  };
+
   return {
     form,
     recogeEnRestaurante,
@@ -150,7 +187,11 @@ export const useEditarPedido = (pedido) => {
     popup,
     toastVisible,
     haySolo,
+    toggleRadio,
     toggleModo,
+    toggleSelector,
+    tieneObs,
+    buildObsText,
     updateQty,
     abrirPopup,
     cerrarPopup,
