@@ -178,34 +178,34 @@ function volver() {
 
     <!-- SECCIÓN 3: FORMA DE PAGO -->
     <div class="section">
-      <div class="section-header">
-        <div class="section-icon">3</div>
-        <h2>Forma de Pago</h2>
-      </div>
-      <div class="section-body">
-        <div class="grid-2">
-          <button
-            type="button"
-            class="btn-restaurante"
-            :class="{ active: logica.formaPago.value === 'Efectivo' }"
-            @click="logica.formaPago.value = 'Efectivo'"
-          >
-            <span class="rest-icon">💵</span>
-            <span class="rest-name">Efectivo</span>
-          </button>
+  <div class="section-header">
+    <div class="section-icon">3</div>
+    <h2>Forma de Pago</h2>
+  </div>
+  <div class="section-body">
+    <div class="grid-2">
+      <button
+        type="button"
+        class="btn-restaurante"
+        :class="{ active: logica.form.formaPago === 'Efectivo' }"
+        @click="logica.form.formaPago = 'Efectivo'"
+      >
+        <span class="rest-icon">💵</span>
+        <span class="rest-name">Efectivo</span>
+      </button>
 
-          <button
-            type="button"
-            class="btn-restaurante"
-            :class="{ active: logica.formaPago.value === 'Transferencia' }"
-            @click="logica.formaPago.value = 'Transferencia'"
-          >
-            <span class="rest-icon">📲</span>
-            <span class="rest-name">Transferencia</span>
-          </button>
-        </div>
-      </div>
+      <button
+        type="button"
+        class="btn-restaurante"
+        :class="{ active: logica.form.formaPago === 'Transferencia' }"
+        @click="logica.form.formaPago = 'Transferencia'"
+      >
+        <span class="rest-icon">📲</span>
+        <span class="rest-name">Transferencia</span>
+      </button>
     </div>
+  </div>
+</div>
 
     <!-- BOTONES -->
     <div class="submit-area">

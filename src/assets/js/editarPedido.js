@@ -1,4 +1,3 @@
-// assets/js/editarPedido.js
 import { ref, reactive } from "vue";
 import { api } from "./api.js";
 import { MENU, OBS_POR_PLATO } from "./userPedido.js";
@@ -9,22 +8,18 @@ export const useEditarPedido = (pedido) => {
     nombre: pedido.cliente.nombre,
     telefono: pedido.cliente.telefono,
     direccion: pedido.cliente.direccion,
+    formaPago: pedido.formaPago ?? "Efectivo", // ← movido aquí
   });
 
   const recogeEnRestaurante = ref(
     !pedido.cliente.direccion || pedido.cliente.direccion.trim() === "",
   );
 
-  // editarPedido.js
-  const formaPago = ref(pedido.formaPago ?? "Efectivo");
-
-  // ── SELECTIONS (igual que en nuevo pedido) ─────────────────────
-  // Reconstruye el estado de selections a partir de los platos guardados
+  // ── SELECTIONS ─────────────────────────────────────────────────
   const selections = ref(
     MENU.map((item) => {
       if (item.cat) return [];
 
-      // Buscar cuántas unidades de este plato hay en el pedido
       const platosDelMenu = pedido.platos.filter((p) => p.nombre === item.name);
 
       return platosDelMenu.map((p) => ({
@@ -117,10 +112,19 @@ export const useEditarPedido = (pedido) => {
       return;
     }
 
+    // 🔥 NUEVA LÓGICA DE ESTADO SEGÚN FORMA DE PAGO
+    let nuevoEstado;
+
+    if (form.formaPago === "Efectivo") {
+      nuevoEstado = "Pagado";
+    } else {
+      nuevoEstado = "Pago pendiente";
+    }
+
     const payload = {
-      restaurante: pedido.restaurante, // se conserva, no se edita
-      formaPago: formaPago.value,
-      estado: pedido.estado,
+      restaurante: pedido.restaurante,
+      formaPago: form.formaPago,
+      estado: nuevoEstado, // ← ahora sí se recalcula
       cliente: {
         nombre: form.nombre,
         telefono: form.telefono,
@@ -130,7 +134,7 @@ export const useEditarPedido = (pedido) => {
     };
 
     try {
-      await api.put(`/pedidos/${pedido.id}/editar`, payload); ///pedidos/:id/editar
+      await api.put(`/pedidos/${pedido.id}/editar`, payload);
       showToast();
       setTimeout(() => window.history.back(), 1500);
     } catch (error) {
@@ -142,7 +146,6 @@ export const useEditarPedido = (pedido) => {
   return {
     form,
     recogeEnRestaurante,
-    formaPago,
     selections,
     popup,
     toastVisible,
