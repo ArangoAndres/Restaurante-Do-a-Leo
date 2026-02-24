@@ -58,22 +58,16 @@
                       <option v-for="s in item.sizes" :key="s" :value="s">{{ s }}</option>
                     </select>
 
+                    <!-- Botón obs: muestra resumen si hay algo, si no "Observaciones" -->
                     <button
                       v-if="OBS_POR_PLATO[item.num]"
                       type="button"
                       class="btn-obs"
-                      :class="{ 'btn-obs--active': unidad.obs.length > 0 }"
+                      :class="{ 'btn-obs--active': tieneObs(unidad.obs) }"
                       @click="abrirPopup(i, j)"
                     >
-                      <template v-if="unidad.obs.length > 0">
-                        <span
-                          v-for="(o, k) in unidad.obs" :key="k"
-                          :class="{
-                            'obs-solo': o.modo === 'Solo',
-                            'obs-no':   o.modo === 'No',
-                            'obs-mas':  o.modo === '+'
-                          }"
-                        >{{ k > 0 ? ', ' : '' }}{{ o.modo === 'Solo' ? 'Solo ' : o.modo === 'No' ? 'No ' : '+ ' }}{{ o.item }}</span>
+                      <template v-if="tieneObs(unidad.obs)">
+                        {{ buildObsText(unidad.obs) }}
                       </template>
                       <template v-else>Observaciones</template>
                     </button>
@@ -195,15 +189,15 @@
 
       <div class="popup-body">
 
-        <!-- Aviso cuando Solo está activo -->
+        <!-- Aviso Solo activo -->
         <div v-if="haySolo()" class="popup-solo-aviso">
           Modo <strong>Solo</strong> activo — no se puede combinar con No o +
         </div>
 
-        <!-- Tabla de ítems con opciones -->
+        <!-- TABLA de ítems -->
         <div class="popup-table">
 
-          <!-- Header -->
+          <!-- Header solo para los modo -->
           <div class="popup-table-header">
             <span class="popup-col-item">Ingrediente</span>
             <span class="popup-col-modo">Solo</span>
@@ -211,47 +205,86 @@
             <span class="popup-col-modo">+</span>
           </div>
 
-          <!-- Filas -->
-          <div
-            v-for="obs in OBS_POR_PLATO[MENU[popup.itemIndex]?.num]"
-            :key="obs"
-            class="popup-table-row"
+          <template
+            v-for="obs in OBS_POR_PLATO[MENU[popup.itemIndex]?.num]?.items"
+            :key="obs.label"
           >
-            <span class="popup-col-item">{{ obs }}</span>
 
-            <!-- Solo -->
-            <span class="popup-col-modo">
-              <button
-                type="button"
-                class="modo-btn modo-solo"
-                :class="{ active: popup.temp[obs] === 'Solo' }"
-                @click="toggleModo(obs, 'Solo')"
-              >Solo</button>
-            </span>
+            <!-- SELECTOR (ej: Sancocho / Arroz) -->
+            <div v-if="obs.tipo === 'selector'" class="popup-table-row popup-row-selector">
+              <span class="popup-col-item">{{ obs.label }}</span>
+              <span class="popup-col-selector">
+                <button
+                  v-for="opc in obs.opciones" :key="opc"
+                  type="button"
+                  class="selector-btn"
+                  :class="{ active: popup.temp.selectores[obs.label] === opc }"
+                  @click="toggleSelector(obs.label, opc)"
+                >{{ opc }}</button>
+              </span>
+            </div>
 
-            <!-- No -->
-            <span class="popup-col-modo">
-              <button
-                type="button"
-                class="modo-btn modo-no"
-                :class="{ active: popup.temp[obs] === 'No' }"
-                :disabled="haySolo()"
-                @click="toggleModo(obs, 'No')"
-              >No</button>
-            </span>
+            <!-- RADIO -->
+            <div v-if="obs.tipo === 'radio'" class="popup-table-row popup-row-radio">
+              <span class="popup-col-item">{{ obs.label }}</span>
+              <span class="popup-col-radio-span">
+                <button
+                  type="button"
+                  class="radio-btn"
+                  :class="{ active: popup.temp.radios.includes(obs.label) }"
+                  @click="toggleRadio(obs.label)"
+                >
+                  <span class="radio-check">✓</span>
+                </button>
+              </span>
+            </div>
 
-            <!-- + -->
-            <span class="popup-col-modo">
-              <button
-                type="button"
-                class="modo-btn modo-mas"
-                :class="{ active: popup.temp[obs] === '+' }"
-                :disabled="haySolo()"
-                @click="toggleModo(obs, '+')"
-              >+</button>
-            </span>
+            <!-- MODO (Solo / No / +) -->
+            <div v-else-if="obs.tipo === 'modo'" class="popup-table-row">
+              <span class="popup-col-item">{{ obs.label }}</span>
 
-          </div>
+              <span class="popup-col-modo">
+                <button
+                  type="button"
+                  class="modo-btn modo-solo"
+                  :class="{ active: popup.temp.modos[obs.label] === 'Solo' }"
+                  @click="toggleModo(obs.label, 'Solo')"
+                >Solo</button>
+              </span>
+
+              <span class="popup-col-modo">
+                <button
+                  type="button"
+                  class="modo-btn modo-no"
+                  :class="{ active: popup.temp.modos[obs.label] === 'No' }"
+                  :disabled="haySolo()"
+                  @click="toggleModo(obs.label, 'No')"
+                >No</button>
+              </span>
+
+              <span class="popup-col-modo">
+                <button
+                  type="button"
+                  class="modo-btn modo-mas"
+                  :class="{ active: popup.temp.modos[obs.label] === '+' }"
+                  :disabled="haySolo()"
+                  @click="toggleModo(obs.label, '+')"
+                >+</button>
+              </span>
+            </div>
+
+          </template>
+        </div>
+
+        <!-- TEXTO LIBRE -->
+        <div class="popup-texto" v-if="OBS_POR_PLATO[MENU[popup.itemIndex]?.num]?.permitirTexto">
+          <label class="popup-texto-label">Observación adicional</label>
+          <input
+            type="text"
+            class="popup-texto-input"
+            placeholder="Ej: sin sal, aparte..."
+            v-model="popup.temp.texto"
+          />
         </div>
 
       </div>
@@ -278,13 +311,16 @@ const {
   selections,
   popup,
   haySolo,
+  toggleRadio,
   toggleModo,
+  toggleSelector,
+  tieneObs,
+  buildObsText,
   updateQty,
   abrirPopup,
   cerrarPopup,
   confirmarPopup,
-  buildObsText,
   resetForm,
-  sendOrder
+  sendOrder,
 } = usePedido()
 </script>

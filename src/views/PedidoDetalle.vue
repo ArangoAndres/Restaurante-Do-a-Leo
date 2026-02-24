@@ -8,15 +8,39 @@ function volver() {
   window.history.back();
 }
 
+/* 🔥 NUEVA FUNCIÓN COMPATIBLE CON LA NUEVA ESTRUCTURA */
 const formatearObservaciones = (observaciones) => {
-  if (!observaciones || !observaciones.length) return "";
-  return observaciones
-    .map(o => {
-      if (o.modo === "+") return `Más ${o.item}`;
-      if (o.modo === "No") return `No ${o.item}`;
-      return o.item;
-    })
-    .join(", ");
+  if (!observaciones) return "";
+
+  const partes = [];
+
+  // 1️⃣ Selectores
+  if (observaciones.selectores) {
+    Object.values(observaciones.selectores).forEach((valor) => {
+      if (valor) partes.push(valor);
+    });
+  }
+
+  // 2️⃣ Radios
+  if (observaciones.radios?.length) {
+    partes.push(...observaciones.radios);
+  }
+
+  // 3️⃣ Modos
+  if (observaciones.modos) {
+    Object.entries(observaciones.modos).forEach(([item, modo]) => {
+      if (modo === "Solo") partes.unshift(`Solo ${item}`);
+      else if (modo === "No") partes.push(`No ${item}`);
+      else if (modo === "+") partes.push(`Más ${item}`);
+    });
+  }
+
+  // 4️⃣ Texto libre
+  if (observaciones.texto?.trim()) {
+    partes.push(observaciones.texto.trim());
+  }
+
+  return partes.join(", ");
 };
 
 const { pedido } = DetallePedido();
@@ -55,7 +79,6 @@ const confirmarPago = async () => {
 const cancelar = computed(() =>
   pedido.value ? cancelarPedido(pedido.value.id) : null
 );
-
 </script>
 
 <template>
@@ -80,7 +103,7 @@ const cancelar = computed(() =>
           <strong>Estado:</strong>
           {{ pedido.estado }}
           <button
-           v-if="pedido.estado === 'Pago pendiente' && pedido.formaPago === 'Transferencia'"
+            v-if="pedido.estado === 'Pago pendiente' && pedido.formaPago === 'Transferencia'"
             class="btn-pago-realizado"
             @click="abrirConfirmacionPago"
           >
@@ -93,19 +116,30 @@ const cancelar = computed(() =>
         <h3>Platos</h3>
         <ul>
           <li v-for="(plato, index) in pedido.platos" :key="index">
-            {{ plato.nombre }} - {{ plato.size }}
-            <span v-if="plato.observaciones?.length">
-              {{ formatearObservaciones(plato.observaciones) }}
+            {{ plato.nombre }}
+            <span v-if="plato.size"> - {{ plato.size }}</span>
+
+            <span
+              v-if="formatearObservaciones(plato.observaciones)"
+              class="obs-text"
+            >
+              — {{ formatearObservaciones(plato.observaciones) }}
             </span>
           </li>
         </ul>
       </div>
 
       <div class="factura-acciones">
-        <button class="btn-editar" @click="$router.push(`/pedidos/${pedido.id}/editar`)">
+        <button
+          class="btn-editar"
+          @click="$router.push(`/pedidos/${pedido.id}/editar`)"
+        >
           ✏️ Editar Pedido
         </button>
-        <button class="btn-cancelar" @click="cancelar.abrirConfirmacion()">
+        <button
+          class="btn-cancelar"
+          @click="cancelar.abrirConfirmacion()"
+        >
           ✕ Cancelar Pedido
         </button>
       </div>
@@ -115,7 +149,11 @@ const cancelar = computed(() =>
     <div v-else>Cargando pedido...</div>
 
     <!-- POPUP CONFIRMAR PAGO -->
-    <div class="popup-overlay" v-if="mostrarConfirmacionPago" @click.self="cerrarConfirmacionPago">
+    <div
+      class="popup-overlay"
+      v-if="mostrarConfirmacionPago"
+      @click.self="cerrarConfirmacionPago"
+    >
       <div class="popup">
         <div class="popup-header">
           <h3>Confirmar Pago</h3>
@@ -138,15 +176,22 @@ const cancelar = computed(() =>
     </div>
 
     <!-- POPUP CANCELAR PEDIDO -->
-    <div class="popup-overlay" v-if="cancelar?.mostrarConfirmacion.value" @click.self="cancelar.cerrarConfirmacion()">
+    <div
+      class="popup-overlay"
+      v-if="cancelar?.mostrarConfirmacion.value"
+      @click.self="cancelar.cerrarConfirmacion()"
+    >
       <div class="popup">
         <div class="popup-header">
           <h3>Cancelar Pedido</h3>
-          <span class="popup-plato">Esta acción no se puede deshacer</span>
+          <span class="popup-plato">
+            Esta acción no se puede deshacer
+          </span>
         </div>
         <div class="popup-body">
           <p style="font-size: .95rem; color: #333;">
-            ¿Estás seguro de que deseas cancelar el pedido <strong>#{{ pedido?.id }}</strong>?
+            ¿Estás seguro de que deseas cancelar el pedido
+            <strong>#{{ pedido?.id }}</strong>?
           </p>
         </div>
         <div class="popup-footer">
