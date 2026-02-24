@@ -78,111 +78,139 @@ const tiempoTranscurrido = (fecha) => {
 }
 
 /* ============================
-   IMPRESIÓN NATIVA (REEMPLAZA QZ)
+   IMPRESIÓN NATIVA
 ============================ */
-
 function imprimirPedido(pedido) {
-  // Crear iframe oculto
-  const iframe = document.createElement('iframe');
-  iframe.style.display = 'none';
-  document.body.appendChild(iframe);
+  const iframe = document.createElement('iframe')
+  iframe.style.cssText = 'position:fixed;top:-9999px;left:-9999px;width:80mm;height:1px;border:none;'
+  document.body.appendChild(iframe)
 
-  // Contenido HTML del ticket
-  let contenidoTicket = `
-    <html>
-      <head>
-        <meta charset="UTF-8" />
-        <style>
-          @page {
-            size: 80mm auto;    /* ancho de papel térmico */
-            margin: 0;          /* sin márgenes */
-          }
+  const doc = iframe.contentDocument || iframe.contentWindow.document
 
-          body {
-            font-family: monospace;
-            font-size: 12px;
-            width: 80mm;
-            margin: 0;
-            padding: 0;
-          }
-
-          h2 {
-            text-align: center;
-            margin: 5px 0;
-            font-size: 14px;
-          }
-
-          .linea {
-            border-top: 1px dashed black;
-            margin: 6px 0;
-          }
-
-          .plato {
-            font-weight: bold;
-            font-size: 13px;
-            margin-bottom: 2px;
-          }
-
-          .obs {
-            margin-left: 10px;
-            font-size: 11px;
-            color: #333;
-          }
-
-          p {
-            margin: 0;
-            padding: 0;
-          }
-
-          @media print {
-            body {
-              -webkit-print-color-adjust: exact;
-              print-color-adjust: exact;
-            }
-          }
-        </style>
-      </head>
-      <body>
-        <h2>🧾 NUEVO PEDIDO</h2>
-        <div class="linea"></div>
-  `;
-
+  let itemsHTML = ''
   pedido.platos.forEach(p => {
-    contenidoTicket += `
-      <div class="plato">${p.nombre} ${p.size ? '- ' + p.size : ''}</div>
-    `;
+    itemsHTML += `<div class="plato">${p.nombre}${p.size ? ' - ' + p.size : ''}</div>`
     if (p.observaciones?.length) {
       p.observaciones.forEach(obs => {
-        contenidoTicket += `<div class="obs">${obs.modo}: ${obs.item}</div>`;
-      });
+        itemsHTML += `<div class="obs">${obs.modo}: ${obs.item}</div>`
+      })
     }
-    contenidoTicket += `<br>`;
-  });
+  })
 
-  contenidoTicket += `
-        <div class="linea"></div>
-        <p style="text-align:center;">--- FIN ---</p>
-      </body>
-    </html>
-  `;
+  // Datos extra del pedido para el ticket
+  const ahora = new Date().toLocaleString('es-CO', {
+    day: '2-digit', month: '2-digit', year: 'numeric',
+    hour: '2-digit', minute: '2-digit'
+  })
 
-  // Escribir contenido e imprimir
-  iframe.contentDocument.write(contenidoTicket);
-  iframe.contentDocument.close();
+  doc.open()
+  doc.write(`<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8"/>
+    <style>
+      /* Ticket 80mm sin márgenes */
+      @page {
+        size: 80mm auto;
+        margin: 0mm;
+      }
 
+      * { box-sizing: border-box; }
+
+      html, body {
+        width: 80mm;
+        margin: 0;
+        padding: 2mm;
+        font-family: 'Courier New', monospace;
+        font-size: 11px;
+        line-height: 1.3;
+        color: #000;
+      }
+
+      .centro { text-align: center; }
+      .negrita { font-weight: bold; }
+
+      h2 {
+        text-align: center;
+        font-size: 14px;
+        margin: 0 0 4px 0;
+        letter-spacing: 1px;
+      }
+
+      .linea {
+        border: none;
+        border-top: 1px dashed #000;
+        margin: 5px 0;
+      }
+
+      .meta {
+        font-size: 10px;
+        margin-bottom: 2px;
+      }
+
+      .plato {
+        font-weight: bold;
+        font-size: 12px;
+        margin: 4px 0 2px 0;
+      }
+
+      .obs {
+        margin-left: 8px;
+        font-size: 10px;
+        color: #333;
+      }
+
+      .fin {
+        text-align: center;
+        margin-top: 6px;
+        font-size: 10px;
+      }
+    </style>
+  </head>
+  <body>
+    <h2>NUEVO PEDIDO</h2>
+    <hr class="linea"/>
+    <div class="meta"><b>Hora:</b> ${ahora}</div>
+    <div class="meta"><b>Dirección:</b> ${pedido.direccion || '—'}</div>
+    <div class="meta"><b>Pago:</b> ${pedido.metodoPago || '—'}</div>
+    <hr class="linea"/>
+    ${itemsHTML}
+    <hr class="linea"/>
+    <div class="fin">--- FIN ---</div>
+  </body>
+</html>`)
+  doc.close()
+
+  // Esperar a que el iframe cargue antes de imprimir
+  iframe.onload = () => {
+    setTimeout(() => {
+      iframe.contentWindow.focus()
+      iframe.contentWindow.print()
+      setTimeout(() => {
+        if (document.body.contains(iframe)) {
+          document.body.removeChild(iframe)
+        }
+      }, 1000)
+    }, 200)
+  }
+
+  // Fallback si onload no dispara (ya estaba cargado)
   setTimeout(() => {
-    iframe.contentWindow.focus();
-    iframe.contentWindow.print();
-
-    // Quitar el iframe después de imprimir
-    setTimeout(() => document.body.removeChild(iframe), 1000);
-    console.log("✅ Pedido enviado a impresora:", pedido.id);
-  }, 300);
+    if (iframe.contentWindow) {
+      iframe.contentWindow.focus()
+      iframe.contentWindow.print()
+      setTimeout(() => {
+        if (document.body.contains(iframe)) {
+          document.body.removeChild(iframe)
+        }
+      }, 1000)
+    }
+  }, 500)
 }
+
 /* ============================
    AUTO-IMPRIMIR NUEVOS PEDIDOS
 ============================ */
-
 onMounted(() => {
   if (onNuevoPedido) {
     onNuevoPedido.value = (pedido) => {

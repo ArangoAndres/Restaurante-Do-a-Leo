@@ -20,7 +20,9 @@
             <div class="pedido-left">
               <div class="cliente-nombre">
                 {{ pedido.cliente?.nombre }}
-                <span class="cliente-telefono">Cel: {{ pedido.cliente?.telefono }}</span>
+                <span class="cliente-telefono">
+                  Cel: {{ pedido.cliente?.telefono }}
+                </span>
               </div>
               <div class="pago-info">
                 {{ pedido.formaPago }}
@@ -47,9 +49,10 @@
 </template>
 
 <script setup>
+import { onMounted } from "vue"
 import { usePedidos } from "../assets/js/Historial.js"
 
-const { pedidos } = usePedidos()
+const { pedidos, onNuevoPedido } = usePedidos()
 
 const formatHora = (fecha) => {
   const date = new Date(fecha)
@@ -71,4 +74,84 @@ const tiempoTranscurrido = (fecha) => {
 
   return `hace ${horas} h ${resto > 0 ? resto + ' min' : ''}`
 }
+
+/* ============================
+   QZ TRAY - IMPRESIÓN
+============================ */
+
+async function conectarQZ() {
+  if (!qz.websocket.isActive()) {
+    await qz.websocket.connect()
+  }
+}
+
+function buildTicket(pedido) {
+  const ESC = '\x1B'
+  const GS = '\x1D'
+
+  const LETRA_GRANDE = ESC + '!' + '\x30'
+  const LETRA_NORMAL = ESC + '!' + '\x00'
+  const CORTE = GS + 'V' + '\x41' + '\x00'
+
+  let ticket = ""
+
+  ticket += LETRA_GRANDE
+  ticket += "NUEVO PEDIDO\n"
+  ticket += "--------------------------------\n"
+
+  ticket += LETRA_NORMAL
+  ticket += `Cliente: ${pedido.cliente?.nombre || ""}\n`
+  ticket += `Tel: ${pedido.cliente?.telefono || ""}\n`
+  ticket += `Dir: ${pedido.cliente?.direccion || ""}\n`
+  ticket += `Pago: ${pedido.formaPago}\n`
+  if (pedido.formaPago !== "Efectivo") {
+    ticket += `Estado: ${pedido.estado}\n`
+  }
+
+  ticket += "--------------------------------\n"
+
+  pedido.platos?.forEach(p => {
+    let linea = p.nombre
+    if (p.size) linea += ` - ${p.size}`
+    ticket += linea + "\n"
+
+    if (p.observaciones?.length) {
+      p.observaciones.forEach(obs => {
+        ticket += `  ${obs.modo}: ${obs.item}\n`
+      })
+    }
+
+    ticket += "\n"
+  })
+
+  ticket += "\n\n"
+  ticket += CORTE
+
+  return ticket
+}
+
+async function imprimirPedido(pedido) {
+  try {
+    await conectarQZ()
+    const config = qz.configs.create("EPSON TM-T20II Receipt")
+    const data = [{
+      type: 'raw',
+      format: 'plain',
+      data: buildTicket(pedido)
+    }]
+    await qz.print(config, data)
+    console.log("Pedido impreso:", pedido.id)
+  } catch (err) {
+    console.error("Error al imprimir:", err)
+  }
+}
+
+/* 🔥 Cuando llega un pedido nuevo → imprimir automáticamente */
+onMounted(() => {
+  if (onNuevoPedido) {
+    onNuevoPedido.value = (pedido) => {
+      imprimirPedido(pedido)
+    }
+  }
+})
 </script>
