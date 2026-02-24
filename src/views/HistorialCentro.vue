@@ -50,103 +50,135 @@
 
 <script setup>
 import { onMounted } from "vue"
+import { useRouter } from "vue-router"
 import { usePedidos } from "../assets/js/Historial.js"
 
+
+const router = useRouter()
 const { pedidos, onNuevoPedido } = usePedidos()
+
 
 const formatHora = (fecha) => {
   const date = new Date(fecha)
-  return date.toLocaleTimeString("es-CO", {
-    hour: "2-digit",
-    minute: "2-digit"
-  })
+  return date.toLocaleTimeString("es-CO", { hour: "2-digit", minute: "2-digit" })
 }
 
 const tiempoTranscurrido = (fecha) => {
   const diff = Date.now() - new Date(fecha).getTime()
   const minutos = Math.floor(diff / 60000)
-
   if (minutos < 1) return "hace segundos"
   if (minutos < 60) return `hace ${minutos} min`
-
   const horas = Math.floor(minutos / 60)
   const resto = minutos % 60
-
   return `hace ${horas} h ${resto > 0 ? resto + ' min' : ''}`
 }
 
 /* ============================
-   QZ TRAY - IMPRESIÓN
+   IMPRESIÓN NATIVA (REEMPLAZA QZ)
 ============================ */
 
-async function conectarQZ() {
-  if (!qz.websocket.isActive()) {
-    await qz.websocket.connect()
-  }
-}
+function imprimirPedido(pedido) {
+  // Crear iframe oculto
+  const iframe = document.createElement('iframe');
+  iframe.style.display = 'none';
+  document.body.appendChild(iframe);
 
-function buildTicket(pedido) {
-  const ESC = '\x1B'
-  const GS = '\x1D'
+  // Contenido HTML del ticket
+  let contenidoTicket = `
+    <html>
+      <head>
+        <meta charset="UTF-8" />
+        <style>
+          @page {
+            size: 80mm auto;    /* ancho de papel térmico */
+            margin: 0;          /* sin márgenes */
+          }
 
-  const LETRA_GRANDE = ESC + '!' + '\x30'
-  const LETRA_NORMAL = ESC + '!' + '\x00'
-  const CORTE = GS + 'V' + '\x41' + '\x00'
+          body {
+            font-family: monospace;
+            font-size: 12px;
+            width: 80mm;
+            margin: 0;
+            padding: 0;
+          }
 
-  let ticket = ""
+          h2 {
+            text-align: center;
+            margin: 5px 0;
+            font-size: 14px;
+          }
 
-  ticket += LETRA_GRANDE
-  ticket += "NUEVO PEDIDO\n"
-  ticket += "--------------------------------\n"
+          .linea {
+            border-top: 1px dashed black;
+            margin: 6px 0;
+          }
 
-  ticket += LETRA_NORMAL
-  ticket += `Cliente: ${pedido.cliente?.nombre || ""}\n`
-  ticket += `Tel: ${pedido.cliente?.telefono || ""}\n`
-  ticket += `Dir: ${pedido.cliente?.direccion || ""}\n`
-  ticket += `Pago: ${pedido.formaPago}\n`
-  if (pedido.formaPago !== "Efectivo") {
-    ticket += `Estado: ${pedido.estado}\n`
-  }
+          .plato {
+            font-weight: bold;
+            font-size: 13px;
+            margin-bottom: 2px;
+          }
 
-  ticket += "--------------------------------\n"
+          .obs {
+            margin-left: 10px;
+            font-size: 11px;
+            color: #333;
+          }
 
-  pedido.platos?.forEach(p => {
-    let linea = p.nombre
-    if (p.size) linea += ` - ${p.size}`
-    ticket += linea + "\n"
+          p {
+            margin: 0;
+            padding: 0;
+          }
 
+          @media print {
+            body {
+              -webkit-print-color-adjust: exact;
+              print-color-adjust: exact;
+            }
+          }
+        </style>
+      </head>
+      <body>
+        <h2>🧾 NUEVO PEDIDO</h2>
+        <div class="linea"></div>
+  `;
+
+  pedido.platos.forEach(p => {
+    contenidoTicket += `
+      <div class="plato">${p.nombre} ${p.size ? '- ' + p.size : ''}</div>
+    `;
     if (p.observaciones?.length) {
       p.observaciones.forEach(obs => {
-        ticket += `  ${obs.modo}: ${obs.item}\n`
-      })
+        contenidoTicket += `<div class="obs">${obs.modo}: ${obs.item}</div>`;
+      });
     }
+    contenidoTicket += `<br>`;
+  });
 
-    ticket += "\n"
-  })
+  contenidoTicket += `
+        <div class="linea"></div>
+        <p style="text-align:center;">--- FIN ---</p>
+      </body>
+    </html>
+  `;
 
-  ticket += "\n\n"
-  ticket += CORTE
+  // Escribir contenido e imprimir
+  iframe.contentDocument.write(contenidoTicket);
+  iframe.contentDocument.close();
 
-  return ticket
+  setTimeout(() => {
+    iframe.contentWindow.focus();
+    iframe.contentWindow.print();
+
+    // Quitar el iframe después de imprimir
+    setTimeout(() => document.body.removeChild(iframe), 1000);
+    console.log("✅ Pedido enviado a impresora:", pedido.id);
+  }, 300);
 }
+/* ============================
+   AUTO-IMPRIMIR NUEVOS PEDIDOS
+============================ */
 
-async function imprimirPedido(pedido) {
-  try {
-    await conectarQZ()
-    const config = qz.configs.create("EPSON TM-T20II Receipt")
-    const data = [{
-      type: 'raw',
-      format: 'plain',
-      data: buildTicket(pedido)
-    }]
-    await qz.print(config, data)
-    console.log("Pedido impreso:", pedido.id)
-  } catch (err) {
-    console.error("Error al imprimir:", err)
-  }
-}
-
-/* 🔥 Cuando llega un pedido nuevo → imprimir automáticamente */
 onMounted(() => {
   if (onNuevoPedido) {
     onNuevoPedido.value = (pedido) => {

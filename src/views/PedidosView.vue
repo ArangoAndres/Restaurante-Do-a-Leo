@@ -198,12 +198,7 @@
         <div class="popup-table">
 
           <!-- Header solo para los modo -->
-          <div class="popup-table-header">
-            <span class="popup-col-item">Ingrediente</span>
-            <span class="popup-col-modo">Solo</span>
-            <span class="popup-col-modo">No</span>
-            <span class="popup-col-modo">+</span>
-          </div>
+         
 
           <template
             v-for="obs in OBS_POR_PLATO[MENU[popup.itemIndex]?.num]?.items"
