@@ -78,63 +78,56 @@ const tiempoTranscurrido = (fecha) => {
 ============================ */
 
 function imprimirPedido(pedido) {
-  // Crear iframe oculto
-  const iframe = document.createElement('iframe');
-  iframe.style.display = 'none';
+  const iframe = document.createElement("iframe");
+  iframe.style.display = "none";
   document.body.appendChild(iframe);
 
-  // Contenido HTML del ticket
   let contenidoTicket = `
     <html>
       <head>
         <meta charset="UTF-8" />
         <style>
           @page {
-            size: 80mm auto;    /* ancho de papel térmico */
-            margin: 0;          /* sin márgenes */
+            size: 80mm auto;
+            margin: 0;
           }
-
           body {
             font-family: monospace;
-            font-size: 12px;
+            font-size: 13px; /* ⬆️ tamaño más grande */
             width: 80mm;
             margin: 0;
             padding: 0;
           }
-
           h2 {
             text-align: center;
-            margin: 5px 0;
-            font-size: 14px;
+            margin: 6px 0;
+            font-size: 16px; /* ⬆️ más grande */
           }
-
           .linea {
             border-top: 1px dashed black;
             margin: 6px 0;
           }
-
+          .grupo {
+            margin-top: 5px;
+            margin-bottom: 5px;
+          }
+          .titulo-grupo {
+            font-weight: bold;
+            font-size: 15px; /* ⬆️ más grande */
+            text-transform: uppercase;
+          }
           .plato {
             font-weight: bold;
-            font-size: 13px;
-            margin-bottom: 2px;
-          }
-
-          .obs {
+            font-size: 14px;
             margin-left: 10px;
-            font-size: 11px;
-            color: #333;
           }
-
+          .obs {
+            margin-left: 20px;
+            font-size: 12px;
+          }
           p {
             margin: 0;
             padding: 0;
-          }
-
-          @media print {
-            body {
-              -webkit-print-color-adjust: exact;
-              print-color-adjust: exact;
-            }
           }
         </style>
       </head>
@@ -143,36 +136,76 @@ function imprimirPedido(pedido) {
         <div class="linea"></div>
   `;
 
-  pedido.platos.forEach(p => {
-    contenidoTicket += `
-      <div class="plato">${p.nombre} ${p.size ? '- ' + p.size : ''}</div>
-    `;
-    if (p.observaciones?.length) {
-      p.observaciones.forEach(obs => {
-        contenidoTicket += `<div class="obs">${obs.modo}: ${obs.item}</div>`;
-      });
-    }
-    contenidoTicket += `<br>`;
+  // 🔹 Agrupar platos por nombre y tamaño
+  const grupos = {};
+  pedido.platos.forEach((p) => {
+    const key = (p.nombre || "Plato") + "|" + (p.size || "");
+    if (!grupos[key]) grupos[key] = [];
+    grupos[key].push(p);
+  });
+
+  // 🔹 Procesar cada grupo
+  Object.entries(grupos).forEach(([key, lista]) => {
+    const [nombreBase, size] = key.split("|");
+    const cantidad = lista.length;
+
+    contenidoTicket += `<div class="grupo"><div class="titulo-grupo">${nombreBase}${size ? " - " + size : ""} x${cantidad}</div>`;
+
+    lista.forEach((p) => {
+      const obs = p.observaciones || {};
+      const partes = [];
+
+      // Radios
+      if (Array.isArray(obs.radios) && obs.radios.length > 0) {
+        obs.radios.forEach((r) => partes.push(r));
+      }
+
+      // Modos
+      if (obs.modos && Object.keys(obs.modos).length > 0) {
+        Object.entries(obs.modos).forEach(([ingrediente, simbolo]) => {
+          if (simbolo === "+" || simbolo === "-") {
+            partes.push(`${simbolo} ${ingrediente}`);
+          } else if (simbolo.toLowerCase() === "no") {
+            partes.push(`No ${ingrediente}`);
+          } else {
+            partes.push(`${ingrediente}: ${simbolo}`);
+          }
+        });
+      }
+
+      // Texto libre
+      if (obs.texto && obs.texto.trim() !== "") {
+        partes.push(obs.texto.trim());
+      }
+
+      // Si no hay observaciones
+      if (partes.length === 0) {
+        partes.push("Normal");
+      }
+
+      // Mostrar cada plato con sus observaciones
+      contenidoTicket += `
+        <div class="plato">${nombreBase}${size ? " - " + size : ""}</div>
+        ${partes.map((t) => `<div class="obs">${t}</div>`).join("")}
+      `;
+    });
+
+    contenidoTicket += `</div><div class="linea"></div>`;
   });
 
   contenidoTicket += `
-        <div class="linea"></div>
-        <p style="text-align:center;">--- FIN ---</p>
       </body>
     </html>
   `;
 
-  // Escribir contenido e imprimir
   iframe.contentDocument.write(contenidoTicket);
   iframe.contentDocument.close();
 
   setTimeout(() => {
     iframe.contentWindow.focus();
     iframe.contentWindow.print();
-
-    // Quitar el iframe después de imprimir
     setTimeout(() => document.body.removeChild(iframe), 1000);
-    console.log("✅ Pedido enviado a impresora:", pedido.id);
+    console.log("✅ Pedido impreso:", pedido.id);
   }, 300);
 }
 /* ============================

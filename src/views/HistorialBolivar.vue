@@ -80,66 +80,25 @@ const tiempoTranscurrido = (fecha) => {
 /* ============================
    IMPRESIÓN NATIVA (REEMPLAZA QZ)
 ============================ */
-
 function imprimirPedido(pedido) {
-  // Crear iframe oculto
-  const iframe = document.createElement('iframe');
-  iframe.style.display = 'none';
+  const iframe = document.createElement("iframe");
+  iframe.style.display = "none";
   document.body.appendChild(iframe);
 
-  // Contenido HTML del ticket
   let contenidoTicket = `
     <html>
       <head>
         <meta charset="UTF-8" />
         <style>
-          @page {
-            size: 80mm auto;    /* ancho de papel térmico */
-            margin: 0;          /* sin márgenes */
-          }
-
-          body {
-            font-family: monospace;
-            font-size: 12px;
-            width: 80mm;
-            margin: 0;
-            padding: 0;
-          }
-
-          h2 {
-            text-align: center;
-            margin: 5px 0;
-            font-size: 14px;
-          }
-
-          .linea {
-            border-top: 1px dashed black;
-            margin: 6px 0;
-          }
-
-          .plato {
-            font-weight: bold;
-            font-size: 13px;
-            margin-bottom: 2px;
-          }
-
-          .obs {
-            margin-left: 10px;
-            font-size: 11px;
-            color: #333;
-          }
-
-          p {
-            margin: 0;
-            padding: 0;
-          }
-
-          @media print {
-            body {
-              -webkit-print-color-adjust: exact;
-              print-color-adjust: exact;
-            }
-          }
+          @page { size: 80mm auto; margin: 0; }
+          body { font-family: monospace; font-size: 13px; width: 80mm; margin: 0; padding: 0; }
+          h2 { text-align: center; margin: 6px 0; font-size: 16px; }
+          .linea { border-top: 1px dashed black; margin: 6px 0; }
+          .grupo { margin-top: 5px; margin-bottom: 5px; }
+          .titulo-grupo { font-weight: bold; font-size: 15px; text-transform: uppercase; }
+          .plato { font-weight: bold; font-size: 14px; margin-left: 10px; }
+          .obs { margin-left: 20px; font-size: 12px; }
+          p { margin: 0; padding: 0; }
         </style>
       </head>
       <body>
@@ -147,36 +106,120 @@ function imprimirPedido(pedido) {
         <div class="linea"></div>
   `;
 
-  pedido.platos.forEach(p => {
-    contenidoTicket += `
-      <div class="plato">${p.nombre} ${p.size ? '- ' + p.size : ''}</div>
-    `;
-    if (p.observaciones?.length) {
-      p.observaciones.forEach(obs => {
-        contenidoTicket += `<div class="obs">${obs.modo}: ${obs.item}</div>`;
-      });
-    }
-    contenidoTicket += `<br>`;
+  // Agrupar platos por nombre + size, pero conservando el orden original en cada grupo
+  const grupos = {};
+  pedido.platos.forEach((p, index) => {
+    const key = (p.nombre || "Plato") + "|" + (p.size || "");
+    if (!grupos[key]) grupos[key] = [];
+    // guardamos el plato y su índice para mantener orden si hace falta
+    grupos[key].push({ item: p, index });
   });
 
-  contenidoTicket += `
+  // Procesar cada grupo en el orden de aparición (ordenamos las keys por el primer index guardado)
+  const entries = Object.entries(grupos).sort((a, b) => {
+    const aIndex = a[1][0].index;
+    const bIndex = b[1][0].index;
+    return aIndex - bIndex;
+  });
+
+  entries.forEach(([key, lista]) => {
+    const [nombreBase, size] = key.split("|");
+    const cantidad = lista.length;
+
+    if (cantidad > 1) {
+      // sección agrupada (solo cuando hay más de 1)
+      contenidoTicket += `<div class="grupo"><div class="titulo-grupo">${nombreBase}${size ? " - " + size : ""} x${cantidad}</div>`;
+      // listar cada ítem dentro del grupo (uno por línea con sus observaciones)
+      lista.forEach(({ item }) => {
+        const obs = item.observaciones || {};
+        const partes = [];
+
+        // radios
+        if (Array.isArray(obs.radios) && obs.radios.length > 0) {
+          obs.radios.forEach(r => partes.push(r));
+        }
+
+        // modos (objeto)
+        if (obs.modos && Object.keys(obs.modos).length > 0) {
+          Object.entries(obs.modos).forEach(([ingrediente, simbolo]) => {
+            if (simbolo === "+" || simbolo === "-") partes.push(`${simbolo} ${ingrediente}`);
+            else if (typeof simbolo === "string" && simbolo.toLowerCase() === "no") partes.push(`No ${ingrediente}`);
+            else partes.push(`${ingrediente}: ${simbolo}`);
+          });
+        }
+
+        // selectores (objeto: clave -> valor o arreglo)
+        if (obs.selectores && Object.keys(obs.selectores).length > 0) {
+          Object.entries(obs.selectores).forEach(([k, v]) => {
+            if (Array.isArray(v)) v.forEach(val => partes.push(`${k}: ${val}`));
+            else partes.push(`${k}: ${v}`);
+          });
+        }
+
+        // texto libre
+        if (obs.texto && typeof obs.texto === "string" && obs.texto.trim() !== "") {
+          partes.push(obs.texto.trim());
+        }
+
+        if (partes.length === 0) partes.push("Normal");
+
+        // Mostrar el plato (nombre - size) y debajo sus observaciones
+        contenidoTicket += `
+          <div class="plato">${nombreBase}${size ? " - " + size : ""}</div>
+          ${partes.map(t => `<div class="obs">${t}</div>`).join("")}
+        `;
+      });
+
+      contenidoTicket += `</div><div class="linea"></div>`;
+    } else {
+      // solo 1 en el grupo -> imprimir normalmente sin encabezado de grupo
+      const item = lista[0].item;
+      const obs = item.observaciones || {};
+      const partes = [];
+
+      if (Array.isArray(obs.radios) && obs.radios.length > 0) {
+        obs.radios.forEach(r => partes.push(r));
+      }
+      if (obs.modos && Object.keys(obs.modos).length > 0) {
+        Object.entries(obs.modos).forEach(([ingrediente, simbolo]) => {
+          if (simbolo === "+" || simbolo === "-") partes.push(`${simbolo} ${ingrediente}`);
+          else if (typeof simbolo === "string" && simbolo.toLowerCase() === "no") partes.push(`No ${ingrediente}`);
+          else partes.push(`${ingrediente}: ${simbolo}`);
+        });
+      }
+      if (obs.selectores && Object.keys(obs.selectores).length > 0) {
+        Object.entries(obs.selectores).forEach(([k, v]) => {
+          if (Array.isArray(v)) v.forEach(val => partes.push(`${k}: ${val}`));
+          else partes.push(`${k}: ${v}`);
+        });
+      }
+      if (obs.texto && typeof obs.texto === "string" && obs.texto.trim() !== "") {
+        partes.push(obs.texto.trim());
+      }
+      if (partes.length === 0) partes.push("Normal");
+
+      contenidoTicket += `
+        <div class="plato">${item.nombre}${item.size ? " - " + item.size : ""}</div>
+        ${partes.map(t => `<div class="obs">${t}</div>`).join("")}
         <div class="linea"></div>
-        <p style="text-align:center;">--- FIN ---</p>
+      `;
+    }
+  });
+
+  // No mostramos "--- FIN ---" (pedido lo pediste sin esa línea)
+  contenidoTicket += `
       </body>
     </html>
   `;
 
-  // Escribir contenido e imprimir
   iframe.contentDocument.write(contenidoTicket);
   iframe.contentDocument.close();
 
   setTimeout(() => {
     iframe.contentWindow.focus();
     iframe.contentWindow.print();
-
-    // Quitar el iframe después de imprimir
     setTimeout(() => document.body.removeChild(iframe), 1000);
-    console.log("✅ Pedido enviado a impresora:", pedido.id);
+    console.log("✅ Pedido impreso:", pedido.id);
   }, 300);
 }
 /* ============================
