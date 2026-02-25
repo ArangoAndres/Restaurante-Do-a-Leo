@@ -990,6 +990,18 @@ input.obs:focus { border-color: var(--yellow-dark); background: #fff; }
   cursor: pointer;
   transition: background .15s;
 }
+.btn-imprimir{
+  font-family: 'DM Sans', sans-serif;
+  font-size: .88rem;
+  font-weight: 600;
+  background: #fff;
+  color: #1a1a1a;
+  border: 2px solid #1a1a1a;
+  border-radius: 6px;
+  padding: 10px 22px;
+  cursor: pointer;
+  transition: background .15s;
+}
 .btn-editar:hover { background: #f5f5f5; }
 
 .btn-cancelar {
@@ -1005,3 +1017,24 @@ input.obs:focus { border-color: var(--yellow-dark); background: #fff; }
   transition: background .15s, color .15s;
 }
 .btn-cancelar:hover { background: #c62828; color: #fff; }
+.plato-linea {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.precio-plato {
+  font-weight: 700;
+  color: #000;
+  font-size: 0.95rem;
+}
+.total-linea {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 10px;
+  padding-top: 8px;
+  border-top: 2px solid #ddd;
+  font-weight: 700;
+  font-size: 1rem;
+}

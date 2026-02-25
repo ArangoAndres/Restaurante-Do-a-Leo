@@ -806,3 +806,86 @@ table.menu-table {
   border-color: var(--black);
   color: var(--black);
 }
+/* ======== POPUP RESUMEN (Confirmar Pedido) ======== */
+.popup-resumen {
+  background: #fff;
+  border: 2px solid var(--black);
+  border-radius: 6px;
+  width: 100%;
+  max-width: 480px;
+  font-family: 'DM Sans', sans-serif;
+  overflow: hidden;
+  animation: slideUp .25s ease both;
+}
+
+.popup-resumen .popup-header {
+  background: var(--yellow);
+  border-bottom: 2px solid var(--black);
+  padding: 14px 18px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .6px;
+  font-size: 1rem;
+}
+
+.popup-resumen .popup-body {
+  padding: 18px 22px;
+  font-size: .92rem;
+  color: #111;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  max-height: 70vh;
+  overflow-y: auto;
+}
+
+.popup-resumen .info-cliente p {
+  margin: 2px 0;
+  font-size: .9rem;
+}
+.popup-resumen .info-cliente strong {
+  font-weight: 700;
+}
+
+.popup-resumen .grupo-resumen {
+  display: flex;
+  flex-direction: column;
+  margin-top: 8px;
+  padding-bottom: 6px;
+  border-bottom: 1px dotted #ccc;
+}
+.popup-resumen .resumen-item {
+  display: flex;
+  justify-content: space-between;
+  font-weight: 600;
+  color: #000;
+}
+.popup-resumen .resumen-item small {
+  font-weight: 400;
+  color: #666;
+}
+.popup-resumen .resumen-obs {
+  font-size: .8rem;
+  color: #444;
+  margin-left: 6px;
+  margin-top: 2px;
+  line-height: 1.2;
+}
+
+.popup-resumen .resumen-total {
+  text-align: right;
+  font-weight: 700;
+  font-size: 1rem;
+  border-top: 2px dotted #aaa;
+  padding-top: 8px;
+  margin-top: 10px;
+}
+
+.popup-resumen .popup-footer {
+  padding: 14px 18px;
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  border-top: 2px solid var(--gray-border);
+  background: #fff;
+}

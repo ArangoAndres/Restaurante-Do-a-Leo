@@ -7,42 +7,24 @@ export { MENU, OBS_POR_PLATO };
 function crearUnidad(sizes) {
   return {
     size: sizes.length > 0 ? sizes[0] : "",
-    obs: {
-      radios: [],
-      modos: {},
-      selectores: {}, // 👈 IMPORTANTE
-      texto: "",
-    },
+    obs: { radios: [], modos: {}, selectores: {}, texto: "" },
   };
 }
 
-// Construye texto resumen para mostrar en el botón de la tabla
+// texto de observaciones resumido
 export function buildObsText(obs) {
   if (!obs) return "";
   const partes = [];
-
-  // Selectores — va primero (ej: "Arroz", "Sancocho")
   const selectores = obs.selectores || {};
-  Object.values(selectores).forEach((v) => {
-    if (v) partes.push(v);
-  });
-
-  // Radios — muestra el label tal cual
-  if (obs.radios?.length) {
-    partes.push(...obs.radios);
-  }
-
-  // Modos — jerarquía: Solo, No, +
+  Object.values(selectores).forEach((v) => v && partes.push(v));
+  if (obs.radios?.length) partes.push(...obs.radios);
   const modos = obs.modos || {};
   Object.entries(modos).forEach(([label, modo]) => {
     if (modo === "Solo") partes.unshift(`Solo ${label}`);
     else if (modo === "No") partes.push(`No ${label}`);
     else if (modo === "+") partes.push(`+ ${label}`);
   });
-
-  // Texto libre
   if (obs.texto?.trim()) partes.push(obs.texto.trim());
-
   return partes.join(", ");
 }
 
@@ -54,8 +36,7 @@ export function usePedido() {
   const toastVisible = ref(false);
   const selections = reactive(MENU.map(() => []));
 
-  // popup.temp tiene la misma estructura que obs:
-  // { radios: [], modos: {}, texto: '' }
+  // popup de observaciones
   const popup = reactive({
     visible: false,
     itemIndex: null,
@@ -63,52 +44,39 @@ export function usePedido() {
     temp: { radios: [], modos: {}, selectores: {}, texto: "" },
   });
 
+  // nuevo popup de resumen
+  const popupResumen = reactive({
+    visible: false,
+    pedido: null,
+  });
+
   function haySolo() {
     return Object.values(popup.temp.modos).some((m) => m === "Solo");
   }
 
-  // RADIO: toggle individual — cada uno es independiente
   function toggleRadio(label) {
     const idx = popup.temp.radios.indexOf(label);
     if (idx === -1) popup.temp.radios.push(label);
     else popup.temp.radios.splice(idx, 1);
   }
 
-  // SELECTOR: opciones excluyentes (ej: Sancocho / Arroz)
   function toggleSelector(label, opcion) {
-    if (popup.temp.selectores[label] === opcion) {
+    if (popup.temp.selectores[label] === opcion)
       delete popup.temp.selectores[label];
-    } else {
-      popup.temp.selectores[label] = opcion;
-    }
+    else popup.temp.selectores[label] = opcion;
   }
 
-  // MODO: Solo/No/+
   function toggleModo(label, modo) {
     const actual = popup.temp.modos[label];
-
-    // Deseleccionar si ya estaba
-    if (actual === modo) {
-      delete popup.temp.modos[label];
-      return;
-    }
-
-    // Solo siempre se puede marcar libremente
-    if (modo === "Solo") {
-      popup.temp.modos[label] = "Solo";
-      return;
-    }
-
-    // No y + se bloquean si hay algún Solo activo
+    if (actual === modo) return delete popup.temp.modos[label];
+    if (modo === "Solo") return (popup.temp.modos[label] = "Solo");
     if ((modo === "No" || modo === "+") && haySolo()) return;
-
     popup.temp.modos[label] = modo;
   }
 
   function abrirPopup(i, j) {
     popup.itemIndex = i;
     popup.unitIndex = j;
-    // Carga lo ya guardado en la unidad
     const saved = selections[i][j].obs;
     popup.temp = {
       radios: [...(saved.radios || [])],
@@ -127,7 +95,6 @@ export function usePedido() {
   }
 
   function confirmarPopup() {
-    // Validar selectores requeridos
     const plato = OBS_POR_PLATO[MENU[popup.itemIndex]?.num];
     if (plato) {
       const requeridos = plato.items.filter(
@@ -149,7 +116,6 @@ export function usePedido() {
     cerrarPopup();
   }
 
-  // Devuelve true si la unidad tiene alguna obs definida
   function tieneObs(obs) {
     if (!obs) return false;
     return (
@@ -180,70 +146,38 @@ export function usePedido() {
     recogeEnRestaurante.value = false;
     restauranteSeleccionado.value = "";
     formaPago.value = "";
-    MENU.forEach((_, i) => {
-      selections[i] = [];
-    });
+    MENU.forEach((_, i) => (selections[i] = []));
     cerrarPopup();
   }
 
-  async function sendOrder() {
+  function construirPedido() {
     const ahora = new Date();
-
-    if (!form.nombre || !form.telefono) {
-      alert("Por favor completa nombre y teléfono.");
-      return;
-    }
-
-    if (!recogeEnRestaurante.value && !form.direccion) {
-      alert("Por favor ingresa la dirección de entrega.");
-      return;
-    }
-
-    if (!formaPago.value) {
-      alert("Por favor selecciona una forma de pago.");
-      return;
-    }
-
-    if (!restauranteSeleccionado.value) {
-      alert("Por favor selecciona un restaurante.");
-      return;
-    }
-
     const platos = [];
 
     MENU.forEach((item, i) => {
       if (item.cat) return;
-
       const unidades = selections[i];
-      if (!unidades || unidades.length === 0) return;
-
+      if (!unidades?.length) return;
       unidades.forEach((u) => {
+        let precio = 0;
+        if (item.prices?.length && item.sizes?.length) {
+          const idx = item.sizes.indexOf(u.size);
+          precio = idx >= 0 ? item.prices[idx] : item.prices[0];
+        } else {
+          precio = item.price || 0;
+        }
+
         platos.push({
           nombre: item.name,
           size: u.size,
-          observaciones: {
-            radios: u.obs.radios || [],
-            modos: u.obs.modos || {},
-            selectores: u.obs.selectores || {}, // 👈 FALTABA ESTO
-            texto: u.obs.texto || "",
-          },
+          precio,
+          observaciones: { ...u.obs },
         });
       });
     });
 
-    if (platos.length === 0) {
-      alert("Por favor agrega al menos un plato.");
-      return;
-    }
-
-    const pedido = {
+    return {
       fecha: ahora,
-      restaurante: restauranteSeleccionado.value,
-      formaPago: formaPago.value,
-      estado:
-        formaPago.value === "Transferencia"
-          ? "Pago pendiente"
-          : "Pago Efectivo",
       cliente: {
         nombre: form.nombre,
         telefono: form.telefono,
@@ -251,19 +185,33 @@ export function usePedido() {
           ? "Recoge en restaurante"
           : form.direccion,
       },
+      formaPago: formaPago.value,
+      restaurante: restauranteSeleccionado.value,
       platos,
     };
+  }
+
+  function abrirResumen() {
+    const pedido = construirPedido();
+    if (pedido.platos.length === 0) {
+      alert("Por favor agrega al menos un plato.");
+      return;
+    }
+    popupResumen.pedido = pedido;
+    popupResumen.visible = true;
+  }
+
+  async function enviarPedidoFinal() {
+    const pedido = popupResumen.pedido;
+    if (!pedido) return;
 
     try {
-      console.log("Pedido a enviar:", JSON.stringify(pedido, null, 2));
-
       const response = await api.post("/pedidos", pedido);
       console.log("Respuesta backend:", response.data);
-
       toastVisible.value = true;
       setTimeout(() => (toastVisible.value = false), 3500);
-
       resetForm();
+      popupResumen.visible = false;
     } catch (error) {
       console.error("Error enviando pedido:", error);
       alert("Error al enviar pedido");
@@ -278,6 +226,7 @@ export function usePedido() {
     toastVisible,
     selections,
     popup,
+    popupResumen,
     haySolo,
     toggleRadio,
     toggleModo,
@@ -289,6 +238,7 @@ export function usePedido() {
     cerrarPopup,
     confirmarPopup,
     resetForm,
-    sendOrder,
+    abrirResumen,
+    enviarPedidoFinal,
   };
 }

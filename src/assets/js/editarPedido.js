@@ -112,16 +112,31 @@ export const useEditarPedido = (pedido) => {
   };
 
   // ── GUARDAR CAMBIOS ────────────────────────────────
+  // ── GUARDAR CAMBIOS ────────────────────────────────
   const guardarCambios = async () => {
     const platos = [];
 
     MENU.forEach((item, i) => {
       if (item.cat) return;
+
       selections.value[i].forEach((unidad) => {
+        // 🔥 Buscar precio correspondiente
+        let precio = 0;
+
+        if (Array.isArray(item.prices) && item.prices.length > 0) {
+          // Si tiene precios por tamaño
+          const idx = item.sizes?.indexOf(unidad.size);
+          precio = idx >= 0 ? item.prices[idx] : item.prices[0];
+        } else if (item.price) {
+          // Si tiene un solo precio fijo
+          precio = item.price;
+        }
+
         platos.push({
           nombre: item.name,
           size: unidad.size,
           observaciones: unidad.obs,
+          precio, // 💰 Nuevo campo con el valor correspondiente
         });
       });
     });

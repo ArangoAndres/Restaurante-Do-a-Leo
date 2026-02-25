@@ -78,6 +78,8 @@ const tiempoTranscurrido = (fecha) => {
 ============================ */
 
 function imprimirPedido(pedido) {
+  if (!pedido) return;
+
   const iframe = document.createElement("iframe");
   iframe.style.display = "none";
   document.body.appendChild(iframe);
@@ -87,13 +89,10 @@ function imprimirPedido(pedido) {
       <head>
         <meta charset="UTF-8" />
         <style>
-          @page {
-            size: 80mm auto;
-            margin: 0;
-          }
+          @page { size: 80mm auto; margin: 0; }
           body {
-            font-family: monospace;
-            font-size: 13px; /* ⬆️ tamaño más grande */
+           
+            font-size: 16px;
             width: 80mm;
             margin: 0;
             padding: 0;
@@ -101,7 +100,7 @@ function imprimirPedido(pedido) {
           h2 {
             text-align: center;
             margin: 6px 0;
-            font-size: 16px; /* ⬆️ más grande */
+            font-size: 16px;
           }
           .linea {
             border-top: 1px dashed black;
@@ -113,30 +112,53 @@ function imprimirPedido(pedido) {
           }
           .titulo-grupo {
             font-weight: bold;
-            font-size: 15px; /* ⬆️ más grande */
+            font-size: 15px;
             text-transform: uppercase;
+            display: flex;
           }
           .plato {
             font-weight: bold;
             font-size: 14px;
-            margin-left: 10px;
+            margin-left: 2px;
+            display: flex;
           }
+            .plato .Price1 {
+              margin-left: 17px;
+            }
+
           .obs {
             margin-left: 20px;
-            font-size: 12px;
+            font-size: 13px;
           }
-          p {
-            margin: 0;
-            padding: 0;
+          .info-cliente {
+            font-size: 14px;
+            margin-bottom: 4px;
+          }
+          .total-final {
+            font-weight: bold;
+            font-size: 15px;
+            text-align: left;
+            margin-top: 10px;
+            border-top: 1px dashed black;
+            padding-top: 5px;
           }
         </style>
       </head>
       <body>
-        <h2>🧾 NUEVO PEDIDO</h2>
+        <h2>🧾 PEDIDO #${pedido.id || "—"}</h2>
+
+        <div class="linea"></div>
+
+        <div class="info-cliente">
+          <p><strong>Dirección:</strong> ${pedido.cliente?.direccion || "—"}</p>
+          <p><strong>Cliente:</strong> ${pedido.cliente?.nombre || "Sin nombre"}</p>
+          <p><strong>Tel:</strong> ${pedido.cliente?.telefono || "—"}</p>
+        </div>
+
         <div class="linea"></div>
   `;
 
-  // 🔹 Agrupar platos por nombre y tamaño
+  // Agrupar platos por nombre + tamaño
   const grupos = {};
   pedido.platos.forEach((p) => {
     const key = (p.nombre || "Plato") + "|" + (p.size || "");
@@ -144,56 +166,100 @@ function imprimirPedido(pedido) {
     grupos[key].push(p);
   });
 
-  // 🔹 Procesar cada grupo
+  let totalPedido = 0;
+
   Object.entries(grupos).forEach(([key, lista]) => {
     const [nombreBase, size] = key.split("|");
     const cantidad = lista.length;
+    const precioUnitario = lista[0].precio || 0;
+    const subtotalGrupo = cantidad * precioUnitario;
+    totalPedido += subtotalGrupo;
 
-    contenidoTicket += `<div class="grupo"><div class="titulo-grupo">${nombreBase}${size ? " - " + size : ""} x${cantidad}</div>`;
+    if (cantidad > 1) {
+      // Grupo con varios platos
+      contenidoTicket += `
+        <div class="grupo">
+          <div class="titulo-grupo">
+            <span>${nombreBase}${size ? " - " + size : ""} x${cantidad}</span>
+            <span class ="Price1">$${subtotalGrupo.toLocaleString("es-CO")}</span>
+          </div>
+      `;
 
-    lista.forEach((p) => {
+      lista.forEach((p) => {
+        const obs = p.observaciones || {};
+        const partes = [];
+
+        if (Array.isArray(obs.radios) && obs.radios.length > 0)
+          obs.radios.forEach((r) => partes.push(r));
+
+        if (obs.modos && Object.keys(obs.modos).length > 0)
+          Object.entries(obs.modos).forEach(([ing, sim]) => {
+            if (sim === "+") partes.push(`+ ${ing}`);
+            else if (sim.toLowerCase() === "no") partes.push(`No ${ing}`);
+            else partes.push(`${ing}: ${sim}`);
+          });
+
+        if (obs.selectores && Object.keys(obs.selectores).length > 0)
+          Object.entries(obs.selectores).forEach(([k, v]) => {
+            if (Array.isArray(v)) v.forEach((val) => partes.push(`${k}: ${val}`));
+            else partes.push(`${k}: ${v}`);
+          });
+
+        if (obs.texto && obs.texto.trim() !== "")
+          partes.push(obs.texto.trim());
+
+        if (partes.length === 0) partes.push("Normal");
+
+        contenidoTicket += `
+          <div class="plato">
+            <span>${nombreBase}${size ? " - " + size : ""}</span>
+            <span>$${precioUnitario.toLocaleString("es-CO")}</span>
+          </div>
+          ${partes.map((t) => `<div class="obs">${t}</div>`).join("")}
+        `;
+      });
+
+      contenidoTicket += `</div><div class="linea"></div>`;
+    } else {
+      // Plato único
+      const p = lista[0];
       const obs = p.observaciones || {};
       const partes = [];
 
-      // Radios
-      if (Array.isArray(obs.radios) && obs.radios.length > 0) {
+      if (Array.isArray(obs.radios) && obs.radios.length > 0)
         obs.radios.forEach((r) => partes.push(r));
-      }
 
-      // Modos
-      if (obs.modos && Object.keys(obs.modos).length > 0) {
-        Object.entries(obs.modos).forEach(([ingrediente, simbolo]) => {
-          if (simbolo === "+" || simbolo === "-") {
-            partes.push(`${simbolo} ${ingrediente}`);
-          } else if (simbolo.toLowerCase() === "no") {
-            partes.push(`No ${ingrediente}`);
-          } else {
-            partes.push(`${ingrediente}: ${simbolo}`);
-          }
+      if (obs.modos && Object.keys(obs.modos).length > 0)
+        Object.entries(obs.modos).forEach(([ing, sim]) => {
+          if (sim === "+") partes.push(`+ ${ing}`);
+          else if (sim.toLowerCase() === "no") partes.push(`No ${ing}`);
+          else partes.push(`${ing}: ${sim}`);
         });
-      }
 
-      // Texto libre
-      if (obs.texto && obs.texto.trim() !== "") {
+      if (obs.selectores && Object.keys(obs.selectores).length > 0)
+        Object.entries(obs.selectores).forEach(([k, v]) => {
+          if (Array.isArray(v)) v.forEach((val) => partes.push(`${k}: ${val}`));
+          else partes.push(`${k}: ${v}`);
+        });
+
+      if (obs.texto && obs.texto.trim() !== "")
         partes.push(obs.texto.trim());
-      }
 
-      // Si no hay observaciones
-      if (partes.length === 0) {
-        partes.push("Normal");
-      }
+      if (partes.length === 0) partes.push("Normal");
 
-      // Mostrar cada plato con sus observaciones
       contenidoTicket += `
-        <div class="plato">${nombreBase}${size ? " - " + size : ""}</div>
+        <div class="plato">
+          <span>${p.nombre}${p.size ? " - " + p.size : ""}</span>
+          <span class ="Price1">$${precioUnitario.toLocaleString("es-CO")}</span>
+        </div>
         ${partes.map((t) => `<div class="obs">${t}</div>`).join("")}
+        <div class="linea"></div>
       `;
-    });
-
-    contenidoTicket += `</div><div class="linea"></div>`;
+    }
   });
 
   contenidoTicket += `
+        <div class="total-final">TOTAL: $${totalPedido.toLocaleString("es-CO")}</div>
       </body>
     </html>
   `;
@@ -205,7 +271,7 @@ function imprimirPedido(pedido) {
     iframe.contentWindow.focus();
     iframe.contentWindow.print();
     setTimeout(() => document.body.removeChild(iframe), 1000);
-    console.log("✅ Pedido impreso:", pedido.id);
+    console.log("🖨️ Pedido impreso:", pedido.id);
   }, 300);
 }
 /* ============================

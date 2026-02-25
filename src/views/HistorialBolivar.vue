@@ -81,6 +81,8 @@ const tiempoTranscurrido = (fecha) => {
    IMPRESIÓN NATIVA (REEMPLAZA QZ)
 ============================ */
 function imprimirPedido(pedido) {
+  if (!pedido) return;
+
   const iframe = document.createElement("iframe");
   iframe.style.display = "none";
   document.body.appendChild(iframe);
@@ -91,123 +93,176 @@ function imprimirPedido(pedido) {
         <meta charset="UTF-8" />
         <style>
           @page { size: 80mm auto; margin: 0; }
-          body { font-family: monospace; font-size: 13px; width: 80mm; margin: 0; padding: 0; }
-          h2 { text-align: center; margin: 6px 0; font-size: 16px; }
-          .linea { border-top: 1px dashed black; margin: 6px 0; }
-          .grupo { margin-top: 5px; margin-bottom: 5px; }
-          .titulo-grupo { font-weight: bold; font-size: 15px; text-transform: uppercase; }
-          .plato { font-weight: bold; font-size: 14px; margin-left: 10px; }
-          .obs { margin-left: 20px; font-size: 12px; }
-          p { margin: 0; padding: 0; }
+          body {
+           
+            font-size: 16px;
+            width: 80mm;
+            margin: 0;
+            padding: 0;
+          }
+          h2 {
+            text-align: center;
+            margin: 6px 0;
+            font-size: 16px;
+          }
+          .linea {
+            border-top: 1px dashed black;
+            margin: 6px 0;
+          }
+          .grupo {
+            margin-top: 5px;
+            margin-bottom: 5px;
+          }
+          .titulo-grupo {
+            font-weight: bold;
+            font-size: 15px;
+            text-transform: uppercase;
+            display: flex;
+          }
+          .plato {
+            font-weight: bold;
+            font-size: 14px;
+            margin-left: 2px;
+            display: flex;
+          }
+            .plato .Price1 {
+              margin-left: 17px;
+            }
+
+          .obs {
+            margin-left: 20px;
+            font-size: 13px;
+          }
+          .info-cliente {
+            font-size: 14px;
+            margin-bottom: 4px;
+          }
+          .total-final {
+            font-weight: bold;
+            font-size: 15px;
+            text-align: left;
+            margin-top: 10px;
+            border-top: 1px dashed black;
+            padding-top: 5px;
+          }
         </style>
       </head>
       <body>
-        <h2>🧾 NUEVO PEDIDO</h2>
+        <h2>🧾 PEDIDO #${pedido.id || "—"}</h2>
+
+        <div class="linea"></div>
+
+        <div class="info-cliente">
+          <p><strong>Dirección:</strong> ${pedido.cliente?.direccion || "—"}</p>
+          <p><strong>Cliente:</strong> ${pedido.cliente?.nombre || "Sin nombre"}</p>
+          <p><strong>Tel:</strong> ${pedido.cliente?.telefono || "—"}</p>
+        </div>
+
         <div class="linea"></div>
   `;
 
-  // Agrupar platos por nombre + size, pero conservando el orden original en cada grupo
+  // Agrupar platos por nombre + tamaño
   const grupos = {};
-  pedido.platos.forEach((p, index) => {
+  pedido.platos.forEach((p) => {
     const key = (p.nombre || "Plato") + "|" + (p.size || "");
     if (!grupos[key]) grupos[key] = [];
-    // guardamos el plato y su índice para mantener orden si hace falta
-    grupos[key].push({ item: p, index });
+    grupos[key].push(p);
   });
 
-  // Procesar cada grupo en el orden de aparición (ordenamos las keys por el primer index guardado)
-  const entries = Object.entries(grupos).sort((a, b) => {
-    const aIndex = a[1][0].index;
-    const bIndex = b[1][0].index;
-    return aIndex - bIndex;
-  });
+  let totalPedido = 0;
 
-  entries.forEach(([key, lista]) => {
+  Object.entries(grupos).forEach(([key, lista]) => {
     const [nombreBase, size] = key.split("|");
     const cantidad = lista.length;
+    const precioUnitario = lista[0].precio || 0;
+    const subtotalGrupo = cantidad * precioUnitario;
+    totalPedido += subtotalGrupo;
 
     if (cantidad > 1) {
-      // sección agrupada (solo cuando hay más de 1)
-      contenidoTicket += `<div class="grupo"><div class="titulo-grupo">${nombreBase}${size ? " - " + size : ""} x${cantidad}</div>`;
-      // listar cada ítem dentro del grupo (uno por línea con sus observaciones)
-      lista.forEach(({ item }) => {
-        const obs = item.observaciones || {};
+      // Grupo con varios platos
+      contenidoTicket += `
+        <div class="grupo">
+          <div class="titulo-grupo">
+            <span>${nombreBase}${size ? " - " + size : ""} x${cantidad}</span>
+            <span class ="Price1">$${subtotalGrupo.toLocaleString("es-CO")}</span>
+          </div>
+      `;
+
+      lista.forEach((p) => {
+        const obs = p.observaciones || {};
         const partes = [];
 
-        // radios
-        if (Array.isArray(obs.radios) && obs.radios.length > 0) {
-          obs.radios.forEach(r => partes.push(r));
-        }
+        if (Array.isArray(obs.radios) && obs.radios.length > 0)
+          obs.radios.forEach((r) => partes.push(r));
 
-        // modos (objeto)
-        if (obs.modos && Object.keys(obs.modos).length > 0) {
-          Object.entries(obs.modos).forEach(([ingrediente, simbolo]) => {
-            if (simbolo === "+" || simbolo === "-") partes.push(`${simbolo} ${ingrediente}`);
-            else if (typeof simbolo === "string" && simbolo.toLowerCase() === "no") partes.push(`No ${ingrediente}`);
-            else partes.push(`${ingrediente}: ${simbolo}`);
+        if (obs.modos && Object.keys(obs.modos).length > 0)
+          Object.entries(obs.modos).forEach(([ing, sim]) => {
+            if (sim === "+") partes.push(`+ ${ing}`);
+            else if (sim.toLowerCase() === "no") partes.push(`No ${ing}`);
+            else partes.push(`${ing}: ${sim}`);
           });
-        }
 
-        // selectores (objeto: clave -> valor o arreglo)
-        if (obs.selectores && Object.keys(obs.selectores).length > 0) {
+        if (obs.selectores && Object.keys(obs.selectores).length > 0)
           Object.entries(obs.selectores).forEach(([k, v]) => {
-            if (Array.isArray(v)) v.forEach(val => partes.push(`${k}: ${val}`));
+            if (Array.isArray(v)) v.forEach((val) => partes.push(`${k}: ${val}`));
             else partes.push(`${k}: ${v}`);
           });
-        }
 
-        // texto libre
-        if (obs.texto && typeof obs.texto === "string" && obs.texto.trim() !== "") {
+        if (obs.texto && obs.texto.trim() !== "")
           partes.push(obs.texto.trim());
-        }
 
         if (partes.length === 0) partes.push("Normal");
 
-        // Mostrar el plato (nombre - size) y debajo sus observaciones
         contenidoTicket += `
-          <div class="plato">${nombreBase}${size ? " - " + size : ""}</div>
-          ${partes.map(t => `<div class="obs">${t}</div>`).join("")}
+          <div class="plato">
+            <span>${nombreBase}${size ? " - " + size : ""}</span>
+            <span>$${precioUnitario.toLocaleString("es-CO")}</span>
+          </div>
+          ${partes.map((t) => `<div class="obs">${t}</div>`).join("")}
         `;
       });
 
       contenidoTicket += `</div><div class="linea"></div>`;
     } else {
-      // solo 1 en el grupo -> imprimir normalmente sin encabezado de grupo
-      const item = lista[0].item;
-      const obs = item.observaciones || {};
+      // Plato único
+      const p = lista[0];
+      const obs = p.observaciones || {};
       const partes = [];
 
-      if (Array.isArray(obs.radios) && obs.radios.length > 0) {
-        obs.radios.forEach(r => partes.push(r));
-      }
-      if (obs.modos && Object.keys(obs.modos).length > 0) {
-        Object.entries(obs.modos).forEach(([ingrediente, simbolo]) => {
-          if (simbolo === "+" || simbolo === "-") partes.push(`${simbolo} ${ingrediente}`);
-          else if (typeof simbolo === "string" && simbolo.toLowerCase() === "no") partes.push(`No ${ingrediente}`);
-          else partes.push(`${ingrediente}: ${simbolo}`);
+      if (Array.isArray(obs.radios) && obs.radios.length > 0)
+        obs.radios.forEach((r) => partes.push(r));
+
+      if (obs.modos && Object.keys(obs.modos).length > 0)
+        Object.entries(obs.modos).forEach(([ing, sim]) => {
+          if (sim === "+") partes.push(`+ ${ing}`);
+          else if (sim.toLowerCase() === "no") partes.push(`No ${ing}`);
+          else partes.push(`${ing}: ${sim}`);
         });
-      }
-      if (obs.selectores && Object.keys(obs.selectores).length > 0) {
+
+      if (obs.selectores && Object.keys(obs.selectores).length > 0)
         Object.entries(obs.selectores).forEach(([k, v]) => {
-          if (Array.isArray(v)) v.forEach(val => partes.push(`${k}: ${val}`));
+          if (Array.isArray(v)) v.forEach((val) => partes.push(`${k}: ${val}`));
           else partes.push(`${k}: ${v}`);
         });
-      }
-      if (obs.texto && typeof obs.texto === "string" && obs.texto.trim() !== "") {
+
+      if (obs.texto && obs.texto.trim() !== "")
         partes.push(obs.texto.trim());
-      }
+
       if (partes.length === 0) partes.push("Normal");
 
       contenidoTicket += `
-        <div class="plato">${item.nombre}${item.size ? " - " + item.size : ""}</div>
-        ${partes.map(t => `<div class="obs">${t}</div>`).join("")}
+        <div class="plato">
+          <span>${p.nombre}${p.size ? " - " + p.size : ""}</span>
+          <span class ="Price1">$${precioUnitario.toLocaleString("es-CO")}</span>
+        </div>
+        ${partes.map((t) => `<div class="obs">${t}</div>`).join("")}
         <div class="linea"></div>
       `;
     }
   });
 
-  // No mostramos "--- FIN ---" (pedido lo pediste sin esa línea)
   contenidoTicket += `
+        <div class="total-final">TOTAL: $${totalPedido.toLocaleString("es-CO")}</div>
       </body>
     </html>
   `;
@@ -219,7 +274,7 @@ function imprimirPedido(pedido) {
     iframe.contentWindow.focus();
     iframe.contentWindow.print();
     setTimeout(() => document.body.removeChild(iframe), 1000);
-    console.log("✅ Pedido impreso:", pedido.id);
+    console.log("🖨️ Pedido impreso:", pedido.id);
   }, 300);
 }
 /* ============================

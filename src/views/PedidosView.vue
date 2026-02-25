@@ -58,7 +58,7 @@
                       <option v-for="s in item.sizes" :key="s" :value="s">{{ s }}</option>
                     </select>
 
-                    <!-- Botón obs: muestra resumen si hay algo, si no "Observaciones" -->
+                    <!-- Botón obs -->
                     <button
                       v-if="OBS_POR_PLATO[item.num]"
                       type="button"
@@ -165,9 +165,53 @@
     <!-- BOTONES -->
     <div class="submit-area">
       <button type="button" class="btn-reset" @click="resetForm">Limpiar</button>
-      <button type="button" class="btn-submit" @click="sendOrder">Enviar Pedido →</button>
+      <button type="button" class="btn-submit" @click="abrirResumen">Confirmar Pedido</button>
     </div>
 
+  </div>
+
+  <!-- POPUP DE CONFIRMACIÓN DE PEDIDO -->
+  <div v-if="popupResumen.visible" class="popup-overlay" @click.self="popupResumen.visible = false">
+    <div class="popup-resumen">
+      <div class="popup-header">
+        <h3>Confirmar Pedido</h3>
+      </div>
+
+      <div class="popup-body">
+        <div class="info-cliente">
+          <p><strong>Cliente:</strong> {{ popupResumen.pedido.cliente.nombre }}</p>
+          <p><strong>Tel:</strong> {{ popupResumen.pedido.cliente.telefono }}</p>
+          <p><strong>Dirección:</strong> {{ popupResumen.pedido.cliente.direccion }}</p>
+          <hr style="margin:8px 0;">
+        </div>
+
+        <div v-for="(plato, index) in popupResumen.pedido.platos" :key="index" class="grupo-resumen">
+          <div class="resumen-item">
+            <span>{{ plato.nombre }} <small v-if="plato.size">({{ plato.size }})</small></span>
+            <span>${{ plato.precio.toLocaleString("es-CO") }}</span>
+          </div>
+          <div v-if="buildObsText(plato.observaciones)" class="resumen-obs">
+            {{ buildObsText(plato.observaciones) }}
+          </div>
+        </div>
+
+        <div class="resumen-total">
+          Total:
+          <strong>
+            ${{
+              popupResumen.pedido.platos
+                .reduce((t, p) => t + (p.precio || 0), 0)
+                .toLocaleString("es-CO")
+            }}
+          </strong>
+        </div>
+      </div>
+
+      <div class="popup-footer">
+        <button type="button" class="btn-reset" @click="popupResumen.visible = false">Volver</button>
+        <button type="button" class="btn-submit" @click="enviarPedidoFinal">Enviar Pedido →</button>
+      </div>
+    </div>
   </div>
 
   <!-- TOAST -->
@@ -189,23 +233,15 @@
 
       <div class="popup-body">
 
-        <!-- Aviso Solo activo -->
         <div v-if="haySolo()" class="popup-solo-aviso">
           Modo <strong>Solo</strong> activo — no se puede combinar con No o +
         </div>
 
-        <!-- TABLA de ítems -->
         <div class="popup-table">
-
-          <!-- Header solo para los modo -->
-         
-
           <template
             v-for="obs in OBS_POR_PLATO[MENU[popup.itemIndex]?.num]?.items"
             :key="obs.label"
           >
-
-            <!-- SELECTOR (ej: Sancocho / Arroz) -->
             <div v-if="obs.tipo === 'selector'" class="popup-table-row popup-row-selector">
               <span class="popup-col-item">{{ obs.label }}</span>
               <span class="popup-col-selector">
@@ -219,7 +255,6 @@
               </span>
             </div>
 
-            <!-- RADIO -->
             <div v-if="obs.tipo === 'radio'" class="popup-table-row popup-row-radio">
               <span class="popup-col-item">{{ obs.label }}</span>
               <span class="popup-col-radio-span">
@@ -234,7 +269,6 @@
               </span>
             </div>
 
-            <!-- MODO (Solo / No / +) -->
             <div v-else-if="obs.tipo === 'modo'" class="popup-table-row">
               <span class="popup-col-item">{{ obs.label }}</span>
 
@@ -267,11 +301,9 @@
                 >+</button>
               </span>
             </div>
-
           </template>
         </div>
 
-        <!-- TEXTO LIBRE -->
         <div class="popup-texto" v-if="OBS_POR_PLATO[MENU[popup.itemIndex]?.num]?.permitirTexto">
           <label class="popup-texto-label">Observación adicional</label>
           <input
@@ -291,7 +323,6 @@
 
     </div>
   </div>
-
 </template>
 
 <script setup>
@@ -305,6 +336,7 @@ const {
   toastVisible,
   selections,
   popup,
+  popupResumen,
   haySolo,
   toggleRadio,
   toggleModo,
@@ -316,6 +348,7 @@ const {
   cerrarPopup,
   confirmarPopup,
   resetForm,
-  sendOrder,
+  abrirResumen,
+  enviarPedidoFinal,
 } = usePedido()
 </script>
