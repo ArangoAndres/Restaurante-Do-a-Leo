@@ -18,11 +18,33 @@
         <tbody>
           <template v-for="(item, i) in MENU" :key="i">
 
-            <tr v-if="item.cat" class="cat-row">
-              <td colspan="3">{{ item.cat }}</td>
+            <!-- CATEGORÍA -->
+            <tr
+              v-if="item.cat"
+              class="cat-row"
+              @click="handleCatClick(item.cat)"
+              :style="{
+                cursor: ['ADICIONALES', 'BEBIDAS'].includes(item.cat) ? 'pointer' : 'default',
+                background: ['ADICIONALES', 'BEBIDAS'].includes(item.cat) ? '#f5f5f5' : ''
+              }"
+            >
+              <td colspan="3">
+                {{ item.cat }}
+                <span
+                  v-if="['ADICIONALES', 'BEBIDAS'].includes(item.cat)"
+                  style="float: right; font-weight: bold;"
+                >
+                  {{ isOpen(item.cat) ? '▲' : '▼' }}
+                </span>
+              </td>
             </tr>
 
-            <tr v-else class="dish-row">
+            <!-- PLATO -->
+            <tr
+              v-else
+              class="dish-row"
+              v-show="shouldShowDish(i)"
+            >
               <td class="dish-name">
                 <span v-if="item.num" class="dish-num">{{ item.num }}.</span>
                 {{ item.name }}
@@ -206,8 +228,8 @@
           <strong>
             ${{
               popupResumen.pedido.platos
-                .reduce((t, p) => t + (p.precio || 0), 0)
-                .toLocaleString('es-CO')
+                .reduce((t, p) => t + Number(p.precio || 0), 0)
+                .toLocaleString("es-CO")
             }}
           </strong>
         </div>
@@ -226,7 +248,6 @@
   <!-- POPUP DE OBSERVACIONES -->
   <div v-if="popup.visible" class="popup-overlay" @click.self="cerrarPopup">
     <div class="popup">
-
       <div class="popup-header">
         <h3>Observaciones</h3>
         <span v-if="popup.itemIndex !== null" class="popup-plato">
@@ -238,7 +259,6 @@
       </div>
 
       <div class="popup-body">
-
         <div v-if="haySolo()" class="popup-solo-aviso">
           Modo <strong>Solo</strong> activo — no se puede combinar con No o +
         </div>
@@ -277,7 +297,6 @@
 
             <div v-else-if="obs.tipo === 'modo'" class="popup-table-row">
               <span class="popup-col-item">{{ obs.label }}</span>
-
               <span class="popup-col-modo">
                 <button
                   type="button"
@@ -286,7 +305,6 @@
                   @click="toggleModo(obs.label, 'Solo')"
                 >Solo</button>
               </span>
-
               <span class="popup-col-modo">
                 <button
                   type="button"
@@ -296,7 +314,6 @@
                   @click="toggleModo(obs.label, 'No')"
                 >No</button>
               </span>
-
               <span class="popup-col-modo">
                 <button
                   type="button"
@@ -319,20 +336,19 @@
             v-model="popup.temp.texto"
           />
         </div>
-
       </div>
 
       <div class="popup-footer">
         <button type="button" class="btn-reset" @click="cerrarPopup">Cancelar</button>
         <button type="button" class="btn-submit" @click="confirmarPopup">Confirmar</button>
       </div>
-
     </div>
   </div>
 </template>
 
 <script setup>
-import { MENU, OBS_POR_PLATO, usePedido } from '../assets/js/userPedido.js'
+import { ref } from "vue";
+import { MENU, OBS_POR_PLATO, usePedido } from '../assets/js/userPedido.js';
 
 const {
   form,
@@ -356,5 +372,49 @@ const {
   resetForm,
   abrirResumen,
   enviarPedidoFinal,
-} = usePedido()
+} = usePedido();
+
+// -----------------------------
+// Lógica para secciones colapsables
+// -----------------------------
+
+// mapa de índice -> categoría a la que pertenece (basado en el orden del MENU)
+const indexToCategory = [];
+let lastCat = null;
+MENU.forEach((it, idx) => {
+  if (it.cat) {
+    lastCat = it.cat;
+    indexToCategory[idx] = it.cat; // para la fila de categoría misma
+  } else {
+    indexToCategory[idx] = lastCat;
+  }
+});
+
+// estado abierto/cerrado por categoría (inicialmente cerradas)
+const openCats = ref({
+  ADICIONALES: false,
+  BEBIDAS: false,
+});
+
+// helper: verificar si una categoría está abierta
+function isOpen(cat) {
+  return !!openCats.value[cat];
+}
+
+// handler: clic en la fila de categoría
+function handleCatClick(cat) {
+  if (['ADICIONALES', 'BEBIDAS'].includes(cat)) {
+    openCats.value[cat] = !openCats.value[cat];
+  }
+}
+
+// helper: decidir si mostrar la fila de plato en el índice i
+function shouldShowDish(i) {
+  const cat = indexToCategory[i];
+  if (!cat) return true;
+  if (cat === 'ADICIONALES' || cat === 'BEBIDAS') {
+    return isOpen(cat);
+  }
+  return true;
+}
 </script>

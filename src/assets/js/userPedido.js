@@ -4,6 +4,15 @@ import { OBS_POR_PLATO } from "../data/ObservacionesData.js";
 import { api } from "./api.js";
 export { MENU, OBS_POR_PLATO };
 
+// 🔹 Radios que son mutuamente excluyentes
+const RADIO_EXCLUSIVOS = [
+  ["¿Sopa Clarita?", "¿Sopa Espesa?"],
+  ["¿3/4?", "¿Termino Medio?", "¿Bien asado?"],
+  ["¿Frito?", "¿Sudado?"],
+  ["¿Solo costilla?", "¿Solo Pierna?"],
+];
+
+// 🔹 Crear una unidad de pedido
 function crearUnidad(sizes) {
   return {
     size: sizes.length > 0 ? sizes[0] : "",
@@ -11,7 +20,7 @@ function crearUnidad(sizes) {
   };
 }
 
-// texto de observaciones resumido
+// 🔹 Construir texto de observaciones
 export function buildObsText(obs) {
   if (!obs) return "";
   const partes = [];
@@ -28,6 +37,7 @@ export function buildObsText(obs) {
   return partes.join(", ");
 }
 
+// 🔹 Hook principal del pedido
 export function usePedido() {
   const form = reactive({ nombre: "", telefono: "", direccion: "" });
   const recogeEnRestaurante = ref(false);
@@ -36,7 +46,7 @@ export function usePedido() {
   const toastVisible = ref(false);
   const selections = reactive(MENU.map(() => []));
 
-  // popup de observaciones
+  // Popup observaciones
   const popup = reactive({
     visible: false,
     itemIndex: null,
@@ -44,28 +54,45 @@ export function usePedido() {
     temp: { radios: [], modos: {}, selectores: {}, texto: "" },
   });
 
-  // nuevo popup de resumen
+  // Popup resumen pedido
   const popupResumen = reactive({
     visible: false,
     pedido: null,
   });
 
+  // ────────────────────────────────────────────────────────────
   function haySolo() {
     return Object.values(popup.temp.modos).some((m) => m === "Solo");
   }
 
+  // 🔹 Radios (mejorado con grupos exclusivos)
   function toggleRadio(label) {
-    const idx = popup.temp.radios.indexOf(label);
-    if (idx === -1) popup.temp.radios.push(label);
-    else popup.temp.radios.splice(idx, 1);
+    const grupo = RADIO_EXCLUSIVOS.find((g) => g.includes(label));
+
+    if (grupo) {
+      // Eliminar todos los radios del mismo grupo
+      popup.temp.radios = popup.temp.radios.filter((r) => !grupo.includes(r));
+
+      // Activar el nuevo (si no estaba activo)
+      if (!popup.temp.radios.includes(label)) {
+        popup.temp.radios.push(label);
+      }
+    } else {
+      // Comportamiento normal para radios no exclusivos
+      const idx = popup.temp.radios.indexOf(label);
+      if (idx === -1) popup.temp.radios.push(label);
+      else popup.temp.radios.splice(idx, 1);
+    }
   }
 
+  // 🔹 Selector
   function toggleSelector(label, opcion) {
     if (popup.temp.selectores[label] === opcion)
       delete popup.temp.selectores[label];
     else popup.temp.selectores[label] = opcion;
   }
 
+  // 🔹 Modo (+, No, Solo)
   function toggleModo(label, modo) {
     const actual = popup.temp.modos[label];
     if (actual === modo) return delete popup.temp.modos[label];
@@ -74,6 +101,7 @@ export function usePedido() {
     popup.temp.modos[label] = modo;
   }
 
+  // 🔹 Abrir popup observaciones
   function abrirPopup(i, j) {
     popup.itemIndex = i;
     popup.unitIndex = j;
@@ -87,6 +115,7 @@ export function usePedido() {
     popup.visible = true;
   }
 
+  // 🔹 Cerrar popup
   function cerrarPopup() {
     popup.visible = false;
     popup.itemIndex = null;
@@ -94,6 +123,7 @@ export function usePedido() {
     popup.temp = { radios: [], modos: {}, selectores: {}, texto: "" };
   }
 
+  // 🔹 Confirmar popup
   function confirmarPopup() {
     const plato = OBS_POR_PLATO[MENU[popup.itemIndex]?.num];
     if (plato) {
@@ -116,6 +146,7 @@ export function usePedido() {
     cerrarPopup();
   }
 
+  // 🔹 Tiene observaciones?
   function tieneObs(obs) {
     if (!obs) return false;
     return (
@@ -126,6 +157,7 @@ export function usePedido() {
     );
   }
 
+  // 🔹 Actualizar cantidad
   function updateQty(i, qty) {
     const item = MENU[i];
     const actual = selections[i].length;
@@ -139,6 +171,7 @@ export function usePedido() {
     }
   }
 
+  // 🔹 Reset formulario
   function resetForm() {
     form.nombre = "";
     form.telefono = "";
@@ -150,6 +183,7 @@ export function usePedido() {
     cerrarPopup();
   }
 
+  // 🔹 Construir pedido
   function construirPedido() {
     const ahora = new Date();
     const platos = [];
@@ -164,7 +198,7 @@ export function usePedido() {
           const idx = item.sizes.indexOf(u.size);
           precio = idx >= 0 ? item.prices[idx] : item.prices[0];
         } else {
-          precio = item.price || 0;
+          precio = item.price ? item.price[0] || 0 : 0;
         }
 
         platos.push({
@@ -187,10 +221,13 @@ export function usePedido() {
       },
       formaPago: formaPago.value,
       restaurante: restauranteSeleccionado.value,
+      estado:
+        formaPago.value === "Transferencia" ? "Pago pendiente" : "Pendiente",
       platos,
     };
   }
 
+  // 🔹 Abrir resumen
   function abrirResumen() {
     const pedido = construirPedido();
     if (pedido.platos.length === 0) {
@@ -201,6 +238,7 @@ export function usePedido() {
     popupResumen.visible = true;
   }
 
+  // 🔹 Enviar pedido
   async function enviarPedidoFinal() {
     const pedido = popupResumen.pedido;
     if (!pedido) return;
@@ -217,6 +255,8 @@ export function usePedido() {
       alert("Error al enviar pedido");
     }
   }
+
+  // ────────────────────────────────────────────────────────────
 
   return {
     form,

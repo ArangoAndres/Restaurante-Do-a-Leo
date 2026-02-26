@@ -283,7 +283,6 @@ export const OBS_POR_PLATO = {
   24: {
     permitirTexto: true,
     items: [
-      { label: "¿Frita?", tipo: "radio" },
       { label: "¿Asada?", tipo: "radio" },
 
       { label: "¿Solo Francesa?", tipo: "radio" },
@@ -300,7 +299,7 @@ export const OBS_POR_PLATO = {
     permitirTexto: true,
     items: [
       { label: "¿Salsa Aparte?", tipo: "radio" },
-      { label: "¿Frita?", tipo: "radio" },
+
       { label: "¿Asada?", tipo: "radio" },
       { label: "¿Solo Francesa?", tipo: "radio" },
       { label: "Arroz", tipo: "modo" },
@@ -332,6 +331,16 @@ export const OBS_POR_PLATO = {
     items: [
       { label: "¿Frito?", tipo: "radio" },
       { label: "¿Sudado?", tipo: "radio" },
+      { label: "¿Arroz de Coco?", tipo: "radio" },
+      { label: "Arroz", tipo: "modo" },
+      { label: "Ensalada", tipo: "modo" },
+      { label: "Patacón", tipo: "modo" },
+    ],
+  },
+  29: {
+    permitirTexto: true,
+    items: [
+      { label: "¿Asada?", tipo: "radio" },
       { label: "¿Arroz de Coco?", tipo: "radio" },
       { label: "Arroz", tipo: "modo" },
       { label: "Ensalada", tipo: "modo" },

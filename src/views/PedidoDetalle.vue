@@ -335,12 +335,12 @@ function imprimirPedido(pedido) {
   </ul>
 <br>
   <!-- TOTAL -->
-  <div class="total-linea">
-    <strong>Total:</strong>
-    <span>
-      ${{ pedido.platos.reduce((sum, p) => sum + (p.precio || 0), 0).toLocaleString("es-CO") }}
-    </span>
-  </div>
+ <div class="total-linea">
+  <strong>Total:</strong>
+  <span>
+    ${{ pedido.platos.reduce((sum, p) => sum + Number(p.precio || 0), 0).toLocaleString("es-CO") }}
+  </span>
+</div>
 </div>
 
       <div class="factura-acciones">
