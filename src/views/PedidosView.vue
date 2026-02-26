@@ -60,7 +60,13 @@
 
                     <!-- Botón obs -->
                     <button
-                      v-if="OBS_POR_PLATO[item.num]"
+                      v-if="
+                        OBS_POR_PLATO[item.num] &&
+                        !(
+                          (item.cat === 'SOPAS' || (item.num >= 1 && item.num <= 4)) &&
+                          (unidad.size === 'Solo Sopa' || unidad.size === '9500')
+                        )
+                      "
                       type="button"
                       class="btn-obs"
                       :class="{ 'btn-obs--active': tieneObs(unidad.obs) }"
@@ -188,7 +194,7 @@
         <div v-for="(plato, index) in popupResumen.pedido.platos" :key="index" class="grupo-resumen">
           <div class="resumen-item">
             <span>{{ plato.nombre }} <small v-if="plato.size">({{ plato.size }})</small></span>
-            <span>${{ plato.precio.toLocaleString("es-CO") }}</span>
+            <span>${{ plato.precio.toLocaleString('es-CO') }}</span>
           </div>
           <div v-if="buildObsText(plato.observaciones)" class="resumen-obs">
             {{ buildObsText(plato.observaciones) }}
@@ -201,7 +207,7 @@
             ${{
               popupResumen.pedido.platos
                 .reduce((t, p) => t + (p.precio || 0), 0)
-                .toLocaleString("es-CO")
+                .toLocaleString('es-CO')
             }}
           </strong>
         </div>
