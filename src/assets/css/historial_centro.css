@@ -1,3 +1,7 @@
+/* =======================
+   ESTILO HISTORIAL BOLÍVAR
+======================= */
+
 /* WRAPPER */
 .historial-wrapper {
   width: 100%;
@@ -32,7 +36,6 @@
   transition: transform .2s ease, box-shadow .25s ease;
   box-shadow: 0 4px 14px rgba(0,0,0,0.07);
 }
-
 .pedido-card:hover {
   transform: translateY(-5px);
   box-shadow: 0 12px 28px rgba(0,0,0,0.11);
@@ -44,7 +47,6 @@
   border-bottom: 1px solid #E6DFAF;
   padding: 14px 20px;
 }
-
 .pedido-direccion {
   font-weight: 800;
   font-size: 1.05rem;
@@ -68,30 +70,16 @@
   flex-direction: column;
   gap: 4px;
 }
-
-.pedido-left {
-  display: flex;
-  flex-direction: column;
-  gap: 3px;
-}
-
-.cliente-nombre {
-  font-size: .95rem;
-  font-weight: 700;
-  color: black;
-}
+.cliente-nombre,
 .cliente-telefono {
   font-size: .95rem;
   font-weight: 700;
   color: black;
-  margin-left: 6px;
 }
-
 .pago-info {
   font-size: .88rem;
   color: black;
 }
-
 .estado-pendiente {
   color: #9a7000;
   font-weight: 600;
@@ -103,21 +91,17 @@
   justify-content: space-between;
   align-items: center;
 }
-
 .pedido-tiempo {
   display: flex;
   flex-direction: column;
   gap: 6px;
 }
-
 .pedido-hora {
   font-size: .9rem;
   font-weight: 500;
   color: black;
 }
-
 .pedido-hace {
-  display: inline-block;
   font-size: .88rem;
   font-weight: 800;
   color: black;
@@ -126,7 +110,6 @@
   border-radius: 20px;
   padding: 5px 14px;
   width: fit-content;
-  
 }
 
 /* BOTÓN VER DETALLE */
@@ -142,8 +125,120 @@
   transition: background .2s ease, border-color .2s ease;
   white-space: nowrap;
 }
-
 .btn-detalle:hover {
   background: #EDE8D8;
   border-color: #C8C2A8;
+}
+
+/* BOTÓN RESUMEN */
+.resumen-dia-btn {
+  margin-bottom: 12px;
+  text-align: right;
+}
+.btn-resumen {
+  background-color: #9a7000;
+  color: white;
+  padding: 8px 14px;
+  border-radius: 8px;
+  cursor: pointer;
+  border: none;
+  font-size: 15px;
+}
+.btn-resumen:hover {
+  background-color: #c49b00;
+}
+
+/* POPUP OVERLAY */
+/* ======== POPUP RESUMEN DEL DÍA ======== */
+.popup-resumen-dia {
+  border: 2px solid var(--black);
+  border-radius: 6px;
+  width: 100%;
+  max-width: 480px;
+  background: var(--white);
+  font-family: 'DM Sans', sans-serif;
+  overflow: hidden;
+  animation: slideUp .25s ease both;
+}
+
+/* Reutiliza el encabezado global */
+.popup-resumen-dia .popup-header {
+  background: var(--yellow);
+  border-bottom: 2px solid var(--black);
+  padding: 14px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+.popup-resumen-dia .popup-header h3 {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--black);
+}
+.popup-resumen-dia .popup-plato {
+  font-size: .85rem;
+  font-weight: 600;
+  color: #555;
+}
+
+/* Cuerpo */
+.popup-resumen-dia .popup-body {
+  padding: 18px 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-height: 70vh;
+  overflow-y: auto;
+}
+
+/* Ítem de resumen */
+.popup-resumen-item {
+  display: flex;
+  justify-content: space-between;
+  font-size: .92rem;
+  font-weight: 600;
+  color: var(--black);
+  padding: 4px 0;
+  border-bottom: 1px dotted #ccc;
+}
+.popup-resumen-item:last-child {
+  border-bottom: none;
+}
+
+/* Total */
+.popup-resumen-total {
+  margin-top: 12px;
+  border-top: 2px dotted #aaa;
+  padding-top: 8px;
+  display: flex;
+  justify-content: space-between;
+  font-weight: 700;
+  font-size: 1rem;
+  color: var(--black);
+}
+
+/* Footer */
+.popup-resumen-dia .popup-footer {
+  padding: 14px 18px;
+  border-top: 2px solid var(--gray-border);
+  background: var(--white);
+  display: flex;
+  justify-content: flex-end;
+}
+
+.btn-cerrar {
+  font-family: 'DM Sans', sans-serif;
+  font-size: .9rem;
+  font-weight: 700;
+  background: var(--yellow);
+  color: var(--black);
+  border: 2px solid var(--black);
+  border-radius: 4px;
+  padding: 8px 18px;
+  cursor: pointer;
+  transition: background .15s;
+}
+.btn-cerrar:hover {
+  background: var(--yellow-dark);
 }

@@ -92,19 +92,20 @@ function imprimirPedido(pedido) {
           @page { size: 80mm auto; margin: 0; }
           body {
            
-            font-size: 16px;
+            font-size: 18px;
             width: 80mm;
             margin: 0;
             padding: 0;
           }
           h2 {
             text-align: center;
-            margin: 6px 0;
-            font-size: 16px;
+          
+            font-size: 17px;
+            Text-transform: uppercase;
           }
           .linea {
             border-top: 1px dashed black;
-            margin: 6px 0;
+           
           }
           .grupo {
             margin-top: 5px;
@@ -121,19 +122,28 @@ function imprimirPedido(pedido) {
             font-size: 14px;
             margin-left: 2px;
             display: flex;
+            Text-transform: uppercase;
           }
             .plato .Price1 {
               margin-left: 17px;
+              
             }
 
           .obs {
-            margin-left: 20px;
-            font-size: 13px;
+            
+            font-size: 12px;
+            Text-transform: uppercase;
           }
-          .info-cliente {
-            font-size: 14px;
-            margin-bottom: 4px;
-          }
+         .info-cliente {
+  font-size: 12px;
+  text-transform: uppercase;
+  margin-bottom: 4px;
+  word-break: break-word;   /* 🔹 Permite cortar palabras largas */
+  white-space: normal;      /* 🔹 Deja que el texto se divida en varias líneas */
+  line-height: 1.2;
+  width: 100%;
+  max-width: 70mm;          /* 🔹 Se ajusta al ancho del papel */
+}
           .total-final {
             font-weight: bold;
             font-size: 15px;
@@ -145,6 +155,9 @@ function imprimirPedido(pedido) {
         </style>
       </head>
       <body>
+        <br>
+        <br>
+        <br>
         <h2>🧾 PEDIDO #${pedido.id || "—"}</h2>
 
         <div class="linea"></div>
@@ -213,7 +226,7 @@ function imprimirPedido(pedido) {
         contenidoTicket += `
           <div class="plato">
             <span>${nombreBase}${size ? " - " + size : ""}</span>
-            <span>$${precioUnitario.toLocaleString("es-CO")}</span>
+            <span class="Price1">$${precioUnitario.toLocaleString("es-CO")}</span>
           </div>
           ${partes.map((t) => `<div class="obs">${t}</div>`).join("")}
         `;

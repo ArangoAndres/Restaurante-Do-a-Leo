@@ -221,8 +221,7 @@ export function usePedido() {
       },
       formaPago: formaPago.value,
       restaurante: restauranteSeleccionado.value,
-      estado:
-        formaPago.value === "Transferencia" ? "Pago pendiente" : "Pendiente",
+      estado: formaPago.value === "Transferencia" ? "Pago pendiente" : "Pago",
       platos,
     };
   }

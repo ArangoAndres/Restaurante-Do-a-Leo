@@ -1,7 +1,11 @@
 <template>
   <div class="historial-wrapper">
-    <div class="pedidos-grid">
+    <!-- Botón de resumen -->
+    <div style="text-align:right; margin-bottom:10px;">
+      <button @click="mostrarResumen">📋 Ver resumen del día</button>
+    </div>
 
+    <div class="pedidos-grid">
       <div
         v-for="pedido in pedidos"
         :key="pedido.id"
@@ -45,15 +49,60 @@
           
         </div>
       </div>
-      
     </div>
+
+    <!-- POPUP RESUMEN -->
+   <!-- POPUP DE RESUMEN -->
+<!-- POPUP RESUMEN DEL DÍA -->
+<div v-if="popupResumenDia" class="popup-overlay" @click.self="popupResumenDia = false">
+  <div class="popup popup-resumen-dia">
+    <!-- ENCABEZADO -->
+    <div class="popup-header">
+      <h3>📋 Resumen del Día</h3>
+      <span class="popup-plato">Ventas agrupadas por plato</span>
+    </div>
+
+    <!-- CUERPO -->
+    <div class="popup-body">
+      <div v-if="resumen.length === 0" style="text-align:center; font-weight:600;">
+        No hay ventas registradas hoy.
+      </div>
+
+      <div v-else>
+        <div
+          v-for="r in resumen"
+          :key="r.nombre + r.size"
+          class="popup-resumen-item"
+        >
+          <span>
+            <strong>{{ r.nombre }}</strong>
+            <span v-if="r.size"> - {{ r.size }}</span>
+            × {{ r.cantidad }}
+          </span>
+          <span>$ {{ r.total.toLocaleString('es-CO') }}</span>
+        </div>
+
+        <div class="popup-resumen-total">
+          <strong>Total del día:</strong>
+          <span>$ {{ totalDia.toLocaleString('es-CO') }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- PIE -->
+    <div class="popup-footer">
+      <button class="btn-cerrar" @click="popupResumenDia = false">Cerrar</button>
+    </div>
+  </div>
+</div>
   </div>
 </template>
 
 <script setup>
-import { onMounted } from "vue"
+import { ref, onMounted } from "vue"
 import { useRouter } from "vue-router"
 import { HistorialBolivar } from "../assets/js/Historial_Bolivar.js"
+import { obtenerResumenDelDia } from "../assets/js/ResumenDiario.js"
 
 const router = useRouter()
 const { pedidos, onNuevoPedido } = HistorialBolivar()
@@ -78,7 +127,7 @@ const tiempoTranscurrido = (fecha) => {
 }
 
 /* ============================
-   IMPRESIÓN NATIVA (REEMPLAZA QZ)
+   IMPRESIÓN NATIVA
 ============================ */
 function imprimirPedido(pedido) {
   if (!pedido) return;
@@ -95,19 +144,20 @@ function imprimirPedido(pedido) {
           @page { size: 80mm auto; margin: 0; }
           body {
            
-            font-size: 16px;
+            font-size: 18px;
             width: 80mm;
             margin: 0;
             padding: 0;
           }
           h2 {
             text-align: center;
-            margin: 6px 0;
-            font-size: 16px;
+          
+            font-size: 17px;
+            Text-transform: uppercase;
           }
           .linea {
             border-top: 1px dashed black;
-            margin: 6px 0;
+           
           }
           .grupo {
             margin-top: 5px;
@@ -124,19 +174,28 @@ function imprimirPedido(pedido) {
             font-size: 14px;
             margin-left: 2px;
             display: flex;
+            Text-transform: uppercase;
           }
             .plato .Price1 {
               margin-left: 17px;
+              
             }
 
           .obs {
-            margin-left: 20px;
-            font-size: 13px;
+            
+            font-size: 12px;
+            Text-transform: uppercase;
           }
-          .info-cliente {
-            font-size: 14px;
-            margin-bottom: 4px;
-          }
+         .info-cliente {
+  font-size: 12px;
+  text-transform: uppercase;
+  margin-bottom: 4px;
+  word-break: break-word;   /* 🔹 Permite cortar palabras largas */
+  white-space: normal;      /* 🔹 Deja que el texto se divida en varias líneas */
+  line-height: 1.2;
+  width: 100%;
+  max-width: 70mm;          /* 🔹 Se ajusta al ancho del papel */
+}
           .total-final {
             font-weight: bold;
             font-size: 15px;
@@ -148,6 +207,9 @@ function imprimirPedido(pedido) {
         </style>
       </head>
       <body>
+        <br>
+        <br>
+        <br>
         <h2>🧾 PEDIDO #${pedido.id || "—"}</h2>
 
         <div class="linea"></div>
@@ -216,7 +278,7 @@ function imprimirPedido(pedido) {
         contenidoTicket += `
           <div class="plato">
             <span>${nombreBase}${size ? " - " + size : ""}</span>
-            <span>$${precioUnitario.toLocaleString("es-CO")}</span>
+            <span class="Price1">$${precioUnitario.toLocaleString("es-CO")}</span>
           </div>
           ${partes.map((t) => `<div class="obs">${t}</div>`).join("")}
         `;
@@ -277,10 +339,10 @@ function imprimirPedido(pedido) {
     console.log("🖨️ Pedido impreso:", pedido.id);
   }, 300);
 }
+
 /* ============================
    AUTO-IMPRIMIR NUEVOS PEDIDOS
 ============================ */
-
 onMounted(() => {
   if (onNuevoPedido) {
     onNuevoPedido.value = (pedido) => {
@@ -288,4 +350,18 @@ onMounted(() => {
     }
   }
 })
+
+/* ============================
+   RESUMEN DEL DÍA
+============================ */
+const resumen = ref([])
+const totalDia = ref(0)
+const popupResumenDia = ref(false)
+
+async function mostrarResumen() {
+  const { lista, totalGeneral } = await obtenerResumenDelDia()
+  resumen.value = lista
+  totalDia.value = totalGeneral
+  popupResumenDia.value = true
+}
 </script>
