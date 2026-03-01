@@ -19,7 +19,7 @@
         Historial R. Centro
       </RouterLink>
 
-      <RouterLink to="/pedidos-centro" @click="menuOpen = false">
+      <RouterLink to="/pedidos/cancelados" @click="menuOpen = false">
         Pedidos Centro
       </RouterLink>
     </nav>

@@ -8,25 +8,21 @@ function volver() {
   window.history.back();
 }
 
-/* 🔥 NUEVA FUNCIÓN COMPATIBLE CON LA NUEVA ESTRUCTURA */
 const formatearObservaciones = (observaciones) => {
   if (!observaciones) return "";
 
   const partes = [];
 
-  // 1️⃣ Selectores
   if (observaciones.selectores) {
     Object.values(observaciones.selectores).forEach((valor) => {
       if (valor) partes.push(valor);
     });
   }
 
-  // 2️⃣ Radios
   if (observaciones.radios?.length) {
     partes.push(...observaciones.radios);
   }
 
-  // 3️⃣ Modos
   if (observaciones.modos) {
     Object.entries(observaciones.modos).forEach(([item, modo]) => {
       if (modo === "Solo") partes.unshift(`Solo ${item}`);
@@ -35,7 +31,6 @@ const formatearObservaciones = (observaciones) => {
     });
   }
 
-  // 4️⃣ Texto libre
   if (observaciones.texto?.trim()) {
     partes.push(observaciones.texto.trim());
   }
@@ -80,7 +75,7 @@ const cancelar = computed(() =>
   pedido.value ? cancelarPedido(pedido.value.id) : null
 );
 
-//! ESTO PARA IMPRIMIR
+// ── IMPRIMIR ──────────────────────────────────────────────────
 function imprimirPedido(pedido) {
   if (!pedido) return;
 
@@ -95,7 +90,6 @@ function imprimirPedido(pedido) {
         <style>
           @page { size: 80mm auto; margin: 0; }
           body {
-           
             font-size: 18px;
             width: 80mm;
             margin: 0;
@@ -103,13 +97,11 @@ function imprimirPedido(pedido) {
           }
           h2 {
             text-align: center;
-          
             font-size: 17px;
-            Text-transform: uppercase;
+            text-transform: uppercase;
           }
           .linea {
             border-top: 1px dashed black;
-           
           }
           .grupo {
             margin-top: 5px;
@@ -126,28 +118,25 @@ function imprimirPedido(pedido) {
             font-size: 14px;
             margin-left: 2px;
             display: flex;
-            Text-transform: uppercase;
+            text-transform: uppercase;
           }
-            .plato .Price1 {
-              margin-left: 17px;
-              
-            }
-
+          .plato .Price1 {
+            margin-left: 17px;
+          }
           .obs {
-            
             font-size: 12px;
-            Text-transform: uppercase;
+            text-transform: uppercase;
           }
-         .info-cliente {
-  font-size: 12px;
-  text-transform: uppercase;
-  margin-bottom: 4px;
-  word-break: break-word;   /* 🔹 Permite cortar palabras largas */
-  white-space: normal;      /* 🔹 Deja que el texto se divida en varias líneas */
-  line-height: 1.2;
-  width: 100%;
-  max-width: 70mm;          /* 🔹 Se ajusta al ancho del papel */
-}
+          .info-cliente {
+            font-size: 12px;
+            text-transform: uppercase;
+            margin-bottom: 4px;
+            word-break: break-word;
+            white-space: normal;
+            line-height: 1.2;
+            width: 100%;
+            max-width: 70mm;
+          }
           .total-final {
             font-weight: bold;
             font-size: 15px;
@@ -159,23 +148,17 @@ function imprimirPedido(pedido) {
         </style>
       </head>
       <body>
-        <br>
-        <br>
-        <br>
+        <br><br><br>
         <h2>🧾 PEDIDO #${pedido.id || "—"}</h2>
-
         <div class="linea"></div>
-
         <div class="info-cliente">
           <p><strong>Dirección:</strong> ${pedido.cliente?.direccion || "—"}</p>
           <p><strong>Cliente:</strong> ${pedido.cliente?.nombre || "Sin nombre"}</p>
           <p><strong>Tel:</strong> ${pedido.cliente?.telefono || "—"}</p>
         </div>
-
         <div class="linea"></div>
   `;
 
-  // Agrupar platos por nombre + tamaño
   const grupos = {};
   pedido.platos.forEach((p) => {
     const key = (p.nombre || "Plato") + "|" + (p.size || "");
@@ -193,12 +176,11 @@ function imprimirPedido(pedido) {
     totalPedido += subtotalGrupo;
 
     if (cantidad > 1) {
-      // Grupo con varios platos
       contenidoTicket += `
         <div class="grupo">
           <div class="titulo-grupo">
             <span>${nombreBase}${size ? " - " + size : ""} x${cantidad}</span>
-            <span class ="Price1">$${subtotalGrupo.toLocaleString("es-CO")}</span>
+            <span class="Price1">$${subtotalGrupo.toLocaleString("es-CO")}</span>
           </div>
       `;
 
@@ -208,23 +190,18 @@ function imprimirPedido(pedido) {
 
         if (Array.isArray(obs.radios) && obs.radios.length > 0)
           obs.radios.forEach((r) => partes.push(r));
-
         if (obs.modos && Object.keys(obs.modos).length > 0)
           Object.entries(obs.modos).forEach(([ing, sim]) => {
             if (sim === "+") partes.push(`+ ${ing}`);
             else if (sim.toLowerCase() === "no") partes.push(`No ${ing}`);
             else partes.push(`${ing}: ${sim}`);
           });
-
         if (obs.selectores && Object.keys(obs.selectores).length > 0)
           Object.entries(obs.selectores).forEach(([k, v]) => {
             if (Array.isArray(v)) v.forEach((val) => partes.push(`${k}: ${val}`));
             else partes.push(`${k}: ${v}`);
           });
-
-        if (obs.texto && obs.texto.trim() !== "")
-          partes.push(obs.texto.trim());
-
+        if (obs.texto && obs.texto.trim() !== "") partes.push(obs.texto.trim());
         if (partes.length === 0) partes.push("Normal");
 
         contenidoTicket += `
@@ -238,36 +215,30 @@ function imprimirPedido(pedido) {
 
       contenidoTicket += `</div><div class="linea"></div>`;
     } else {
-      // Plato único
       const p = lista[0];
       const obs = p.observaciones || {};
       const partes = [];
 
       if (Array.isArray(obs.radios) && obs.radios.length > 0)
         obs.radios.forEach((r) => partes.push(r));
-
       if (obs.modos && Object.keys(obs.modos).length > 0)
         Object.entries(obs.modos).forEach(([ing, sim]) => {
           if (sim === "+") partes.push(`+ ${ing}`);
           else if (sim.toLowerCase() === "no") partes.push(`No ${ing}`);
           else partes.push(`${ing}: ${sim}`);
         });
-
       if (obs.selectores && Object.keys(obs.selectores).length > 0)
         Object.entries(obs.selectores).forEach(([k, v]) => {
           if (Array.isArray(v)) v.forEach((val) => partes.push(`${k}: ${val}`));
           else partes.push(`${k}: ${v}`);
         });
-
-      if (obs.texto && obs.texto.trim() !== "")
-        partes.push(obs.texto.trim());
-
+      if (obs.texto && obs.texto.trim() !== "") partes.push(obs.texto.trim());
       if (partes.length === 0) partes.push("Normal");
 
       contenidoTicket += `
         <div class="plato">
           <span>${p.nombre}${p.size ? " - " + p.size : ""}</span>
-          <span class ="Price1">$${precioUnitario.toLocaleString("es-CO")}</span>
+          <span class="Price1">$${precioUnitario.toLocaleString("es-CO")}</span>
         </div>
         ${partes.map((t) => `<div class="obs">${t}</div>`).join("")}
         <div class="linea"></div>
@@ -288,7 +259,6 @@ function imprimirPedido(pedido) {
     iframe.contentWindow.focus();
     iframe.contentWindow.print();
     setTimeout(() => document.body.removeChild(iframe), 1000);
-    console.log("🖨️ Pedido impreso:", pedido.id);
   }, 300);
 }
 </script>
@@ -324,37 +294,35 @@ function imprimirPedido(pedido) {
         </p>
       </div>
 
-   <div class="factura-platos">
-  <h3>Platos</h3>
-  <ul>
-    <li v-for="(plato, index) in pedido.platos" :key="index">
-      <div class="plato-linea">
-        <span>
-          {{ plato.nombre }}
-          <span v-if="plato.size"> ({{ plato.size }})</span>
-        </span>
-        <span v-if="plato.precio" class="precio-plato">
-          ${{ plato.precio.toLocaleString("es-CO") }}
-        </span>
+      <div class="factura-platos">
+        <h3>Platos</h3>
+        <ul>
+          <li v-for="(plato, index) in pedido.platos" :key="index">
+            <div class="plato-linea">
+              <span>
+                {{ plato.nombre }}
+                <span v-if="plato.size"> ({{ plato.size }})</span>
+              </span>
+              <span v-if="plato.precio" class="precio-plato">
+                ${{ plato.precio.toLocaleString("es-CO") }}
+              </span>
+            </div>
+            <div
+              v-if="formatearObservaciones(plato.observaciones)"
+              class="obs-text"
+            >
+              {{ formatearObservaciones(plato.observaciones) }}
+            </div>
+          </li>
+        </ul>
+        <br>
+        <div class="total-linea">
+          <strong>Total:</strong>
+          <span>
+            ${{ pedido.platos.reduce((sum, p) => sum + Number(p.precio || 0), 0).toLocaleString("es-CO") }}
+          </span>
+        </div>
       </div>
-
-      <div
-        v-if="formatearObservaciones(plato.observaciones)"
-        class="obs-text"
-      >
-        {{ formatearObservaciones(plato.observaciones) }}
-      </div>
-    </li>
-  </ul>
-<br>
-  <!-- TOTAL -->
- <div class="total-linea">
-  <strong>Total:</strong>
-  <span>
-    ${{ pedido.platos.reduce((sum, p) => sum + Number(p.precio || 0), 0).toLocaleString("es-CO") }}
-  </span>
-</div>
-</div>
 
       <div class="factura-acciones">
         <button
@@ -370,8 +338,8 @@ function imprimirPedido(pedido) {
           ✕ Cancelar Pedido
         </button>
         <button class="btn-imprimir" @click="imprimirPedido(pedido)">
-  🖨️ Imprimir Pedido
-</button>
+          🖨️ Imprimir Pedido
+        </button>
       </div>
 
     </div>
@@ -406,34 +374,45 @@ function imprimirPedido(pedido) {
     </div>
 
     <!-- POPUP CANCELAR PEDIDO -->
-    <div
-      class="popup-overlay"
-      v-if="cancelar?.mostrarConfirmacion.value"
-      @click.self="cancelar.cerrarConfirmacion()"
-    >
-      <div class="popup">
-        <div class="popup-header">
-          <h3>Cancelar Pedido</h3>
-          <span class="popup-plato">
-            Esta acción no se puede deshacer
-          </span>
-        </div>
-        <div class="popup-body">
-          <p style="font-size: .95rem; color: #333;">
-            ¿Estás seguro de que deseas cancelar el pedido
-            <strong>#{{ pedido?.id }}</strong>?
-          </p>
-        </div>
-        <div class="popup-footer">
-          <button class="btn-reset" @click="cancelar.cerrarConfirmacion()">
-            No, volver
-          </button>
-          <button class="btn-cancelar" @click="cancelar.confirmarCancelacion()">
-            Sí, cancelar
-          </button>
-        </div>
+    <!-- POPUP CANCELAR PEDIDO -->
+<div
+  class="popup-overlay"
+  v-if="cancelar?.mostrarConfirmacion.value"
+  @click.self="cancelar.cerrarConfirmacion()"
+>
+  <div class="popup">
+    <div class="popup-header">
+      <h3>Cancelar Pedido</h3>
+      <span class="popup-plato">Esta acción no se puede deshacer</span>
+    </div>
+    <div class="popup-body">
+      <p style="font-size: .95rem; color: #333;">
+        ¿Estás seguro de que deseas cancelar el pedido
+        <strong>#{{ pedido?.id }}</strong>?
+      </p>
+      <div class="field">
+        <label class="popup-label">
+          Razón de cancelación <span class="required">*</span>
+        </label>
+        <textarea
+          v-model="cancelar.razonCancelacion.value"
+          class="popup-textarea"
+          :class="{ 'popup-textarea--error': !cancelar.razonCancelacion.value.trim() }"
+          placeholder="Ej: Cliente llamó para cancelar, dirección incorrecta..."
+          rows="3"
+        />
       </div>
     </div>
+    <div class="popup-footer">
+      <button class="btn-reset" @click="cancelar.cerrarConfirmacion()">
+        No, volver
+      </button>
+      <button class="btn-cancelar" @click="cancelar.confirmarCancelacion()">
+        Sí, cancelar
+      </button>
+    </div>
+  </div>
+</div>
 
   </div>
 </template>

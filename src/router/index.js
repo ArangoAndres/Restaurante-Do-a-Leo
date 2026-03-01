@@ -30,6 +30,10 @@ const router = createRouter({
       path: "/pedidos/centro/editar",
       component: () => import("../views/Centro_Editar.vue"),
     },
+    {
+      path: "/pedidos/cancelados",
+      component: () => import("../views/HistorialCancelados.vue"),
+    },
   ],
 });
 

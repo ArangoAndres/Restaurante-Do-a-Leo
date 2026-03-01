@@ -60,39 +60,31 @@ export function usePedido() {
     pedido: null,
   });
 
-  // ────────────────────────────────────────────────────────────
   function haySolo() {
     return Object.values(popup.temp.modos).some((m) => m === "Solo");
   }
 
-  // 🔹 Radios (mejorado con grupos exclusivos)
   function toggleRadio(label) {
     const grupo = RADIO_EXCLUSIVOS.find((g) => g.includes(label));
 
     if (grupo) {
-      // Eliminar todos los radios del mismo grupo
       popup.temp.radios = popup.temp.radios.filter((r) => !grupo.includes(r));
-
-      // Activar el nuevo (si no estaba activo)
       if (!popup.temp.radios.includes(label)) {
         popup.temp.radios.push(label);
       }
     } else {
-      // Comportamiento normal para radios no exclusivos
       const idx = popup.temp.radios.indexOf(label);
       if (idx === -1) popup.temp.radios.push(label);
       else popup.temp.radios.splice(idx, 1);
     }
   }
 
-  // 🔹 Selector
   function toggleSelector(label, opcion) {
     if (popup.temp.selectores[label] === opcion)
       delete popup.temp.selectores[label];
     else popup.temp.selectores[label] = opcion;
   }
 
-  // 🔹 Modo (+, No, Solo)
   function toggleModo(label, modo) {
     const actual = popup.temp.modos[label];
     if (actual === modo) return delete popup.temp.modos[label];
@@ -101,7 +93,6 @@ export function usePedido() {
     popup.temp.modos[label] = modo;
   }
 
-  // 🔹 Abrir popup observaciones
   function abrirPopup(i, j) {
     popup.itemIndex = i;
     popup.unitIndex = j;
@@ -115,7 +106,6 @@ export function usePedido() {
     popup.visible = true;
   }
 
-  // 🔹 Cerrar popup
   function cerrarPopup() {
     popup.visible = false;
     popup.itemIndex = null;
@@ -123,7 +113,6 @@ export function usePedido() {
     popup.temp = { radios: [], modos: {}, selectores: {}, texto: "" };
   }
 
-  // 🔹 Confirmar popup
   function confirmarPopup() {
     const plato = OBS_POR_PLATO[MENU[popup.itemIndex]?.num];
     if (plato) {
@@ -137,16 +126,17 @@ export function usePedido() {
         }
       }
     }
+
     selections[popup.itemIndex][popup.unitIndex].obs = {
       radios: [...popup.temp.radios],
       modos: { ...popup.temp.modos },
       selectores: { ...popup.temp.selectores },
       texto: popup.temp.texto,
     };
+
     cerrarPopup();
   }
 
-  // 🔹 Tiene observaciones?
   function tieneObs(obs) {
     if (!obs) return false;
     return (
@@ -157,11 +147,11 @@ export function usePedido() {
     );
   }
 
-  // 🔹 Actualizar cantidad
   function updateQty(i, qty) {
     const item = MENU[i];
     const actual = selections[i].length;
     const nueva = parseInt(qty) || 0;
+
     if (nueva > actual) {
       for (let j = actual; j < nueva; j++) {
         selections[i].push(crearUnidad(item.sizes || []));
@@ -171,7 +161,6 @@ export function usePedido() {
     }
   }
 
-  // 🔹 Reset formulario
   function resetForm() {
     form.nombre = "";
     form.telefono = "";
@@ -183,7 +172,7 @@ export function usePedido() {
     cerrarPopup();
   }
 
-  // 🔹 Construir pedido
+  // 🔹 Construir pedido (ACTUALIZADO)
   function construirPedido() {
     const ahora = new Date();
     const platos = [];
@@ -192,8 +181,10 @@ export function usePedido() {
       if (item.cat) return;
       const unidades = selections[i];
       if (!unidades?.length) return;
+
       unidades.forEach((u) => {
         let precio = 0;
+
         if (item.prices?.length && item.sizes?.length) {
           const idx = item.sizes.indexOf(u.size);
           precio = idx >= 0 ? item.prices[idx] : item.prices[0];
@@ -212,6 +203,7 @@ export function usePedido() {
 
     return {
       fecha: ahora,
+
       cliente: {
         nombre: form.nombre,
         telefono: form.telefono,
@@ -219,25 +211,35 @@ export function usePedido() {
           ? "Recoge en restaurante"
           : form.direccion,
       },
+
       formaPago: formaPago.value,
       restaurante: restauranteSeleccionado.value,
+
+      // 🔹 Estado de pago
       estado: formaPago.value === "Transferencia" ? "Pago pendiente" : "Pago",
+
+      // 🔹 NUEVO: estado del pedido
+      estado_pedido: "Listo",
+
+      // 🔹 NUEVO: razón de cancelación vacía
+      razon_cancelacion: null,
+
       platos,
     };
   }
 
-  // 🔹 Abrir resumen
   function abrirResumen() {
     const pedido = construirPedido();
+
     if (pedido.platos.length === 0) {
       alert("Por favor agrega al menos un plato.");
       return;
     }
+
     popupResumen.pedido = pedido;
     popupResumen.visible = true;
   }
 
-  // 🔹 Enviar pedido
   async function enviarPedidoFinal() {
     const pedido = popupResumen.pedido;
     if (!pedido) return;
@@ -245,8 +247,10 @@ export function usePedido() {
     try {
       const response = await api.post("/pedidos", pedido);
       console.log("Respuesta backend:", response.data);
+
       toastVisible.value = true;
       setTimeout(() => (toastVisible.value = false), 3500);
+
       resetForm();
       popupResumen.visible = false;
     } catch (error) {
@@ -254,8 +258,6 @@ export function usePedido() {
       alert("Error al enviar pedido");
     }
   }
-
-  // ────────────────────────────────────────────────────────────
 
   return {
     form,
