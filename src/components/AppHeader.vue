@@ -20,7 +20,7 @@
       </RouterLink>
 
       <RouterLink to="/pedidos/cancelados" @click="menuOpen = false">
-        Pedidos Centro
+        Historial Pedidos Cancelados
       </RouterLink>
     </nav>
 
@@ -46,8 +46,8 @@ const pageTitle = computed(() => {
   switch (route.path) {
     case '/':
       return 'Pedidos Central'
-    case '/pedidos-centro':
-      return 'Pedidos Centro'
+    case '/pedidos/cancelados':
+      return 'Historial Pedidos Cancelados'
     case '/historial-bolivar':
       return 'Historial Bolívar'
     case '/historial-centro':

@@ -6,7 +6,7 @@
         v-for="pedido in pedidos"
         :key="pedido.id"
         class="pedido-card clickable"
-        @click="irADetalle(pedido.id)"
+        @click="irADetalle(pedido.canceladoId)"
       >
         <div class="pedido-card-header">
           <span class="pedido-direccion">
@@ -38,7 +38,7 @@
               <span class="pedido-hora">🕐 {{ formatHora(pedido.fecha) }}</span>
               <span class="pedido-hace">{{ tiempoTranscurrido(pedido.fecha) }}</span>
             </div>
-            <button class="btn-detalle" @click.stop="irADetalle(pedido.id)">
+            <button class="btn-detalle" @click.stop="irADetalle(pedido.canceladoId)">
               ver detalle
             </button>
           </div>
@@ -58,8 +58,8 @@ import { Historial_Cancelados } from "../assets/js/Historial_Cancelados.js"
 const router = useRouter()
 const { pedidos, onNuevoPedido } = Historial_Cancelados()
 
-function irADetalle(id) {
-  router.push(`/pedido/${id}`)
+function irADetalle(canceladoId) {
+  router.push(`/cancelados/${canceladoId}`)
 }
 
 const formatHora = (fecha) => {

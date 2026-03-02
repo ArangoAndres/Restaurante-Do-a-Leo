@@ -21,8 +21,8 @@ export const cancelarPedido = (pedidoId) => {
       return;
     }
     try {
-      await api.delete(`/pedidos/${pedidoId}`, {
-        data: { razon_cancelacion: razonCancelacion.value.trim() },
+      await api.post(`/pedidos/${pedidoId}/cancelar`, {
+        razon_cancelacion: razonCancelacion.value.trim(),
       });
       window.history.back();
     } catch (error) {

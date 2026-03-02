@@ -19,8 +19,8 @@ const router = createRouter({
       component: () => import("../views/HistorialCentro.vue"),
     },
     {
-      path: "/pedidos-centro",
-      component: () => import("../views/PedidosCentro.vue"),
+      path: "/cancelados/:canceladoId",
+      component: () => import("../views/PedidoDetalleCancelado.vue"),
     },
     {
       path: "/pedidos/:id/editar",

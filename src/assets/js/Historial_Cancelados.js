@@ -3,7 +3,7 @@ import { api } from "./api";
 
 export function Historial_Cancelados() {
   const pedidos = ref([]);
-  const onNuevoPedido = ref(null); // callback que el componente puede asignar
+  const onNuevoPedido = ref(null);
   let interval = null;
   let idsConocidos = new Set();
 
