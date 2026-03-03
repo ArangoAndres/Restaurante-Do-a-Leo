@@ -4,19 +4,19 @@ export const MENU = [
     num: 1,
     name: "Chanfaina",
     sizes: ["Solo Sopa", "9500", "Normal"],
-    prices: [18000, 9500, 13000],
+    prices: [13000, 9500, 18000],
   },
   {
     num: 2,
     name: "Mondongo",
     sizes: ["Solo Sopa", "9500", "Normal"],
-    prices: [18000, 9500, 13000],
+    prices: [13000, 9500, 18000],
   },
   {
     num: 3,
     name: "Frijoles",
     sizes: ["Solo Sopa", "9500", "Normal"],
-    prices: [18000, 9500, 13000],
+    prices: [13000, 9500, 18000],
   },
   {
     num: 4,

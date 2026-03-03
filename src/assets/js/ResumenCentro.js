@@ -8,9 +8,9 @@ MENU.forEach((item) => {
   }
 });
 
-export async function obtenerResumenDelDia() {
+export async function obtenerResumenDelDiaCentro() {
   try {
-    const { data } = await api.get("/pedidos/bolivar");
+    const { data } = await api.get("/pedidos/centro");
 
     const hoy = new Date().toISOString().split("T")[0];
 
