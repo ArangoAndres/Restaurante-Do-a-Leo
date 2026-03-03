@@ -97,7 +97,7 @@
 import { ref, onMounted } from "vue"
 import { useRouter } from "vue-router"
 import { usePedidos } from "../assets/js/Historial.js"
-import { obtenerResumenDelDiaCentro } from "../assets/js/ResumenDiarioCentro.js"
+import { obtenerResumenDelDiaCentro } from "../assets/js/ResumenCentro.js"
 
 const router = useRouter()
 const { pedidos, onNuevoPedido } = usePedidos()
