@@ -76,6 +76,7 @@ const cancelar = computed(() =>
 );
 
 // ── IMPRIMIR ──────────────────────────────────────────────────
+// ── IMPRIMIR ──────────────────────────────────────────────────
 function imprimirPedido(pedido) {
   if (!pedido) return;
 
@@ -91,7 +92,7 @@ function imprimirPedido(pedido) {
           @page { size: 80mm auto; margin: 0; }
           body {
             font-size: 18px;
-            width: 80mm;
+            width: 70mm;
             margin: 0;
             padding: 0;
           }
@@ -99,6 +100,17 @@ function imprimirPedido(pedido) {
             text-align: center;
             font-size: 17px;
             text-transform: uppercase;
+          }
+          .encabezado {
+            text-align: center;
+            font-size: 16px;
+            text-transform: uppercase;
+            margin-bottom: 4px;
+            line-height: 1.4;
+          }
+          .encabezado .nombre-restaurante {
+            font-weight: bold;
+            font-size: 20px;
           }
           .linea {
             border-top: 1px dashed black;
@@ -149,6 +161,13 @@ function imprimirPedido(pedido) {
       </head>
       <body>
         <br><br><br>
+        <div class="encabezado">
+          <div class="nombre-restaurante">RESTAURANTE DOÑA LEO</div>
+          <div>NIT: 1098687925-3</div>
+          <div>Tel: 3214895544</div>
+          <div>Direccion: Calle 41 # 14-17</div>
+        </div>
+        <div class="linea"></div>
         <h2>🧾 PEDIDO #${pedido.id || "—"}</h2>
         <div class="linea"></div>
         <div class="info-cliente">

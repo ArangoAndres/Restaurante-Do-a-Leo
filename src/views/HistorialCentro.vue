@@ -130,20 +130,84 @@ function imprimirPedido(pedido) {
         <meta charset="UTF-8" />
         <style>
           @page { size: 80mm auto; margin: 0; }
-          body { font-size: 18px; width: 80mm; margin: 0; padding: 0; }
-          h2 { text-align: center; font-size: 17px; text-transform: uppercase; }
-          .linea { border-top: 1px dashed black; }
-          .grupo { margin-top: 5px; margin-bottom: 5px; }
-          .titulo-grupo { font-weight: bold; font-size: 15px; text-transform: uppercase; display: flex; }
-          .plato { font-weight: bold; font-size: 14px; margin-left: 2px; display: flex; text-transform: uppercase; }
-          .plato .Price1 { margin-left: 17px; }
-          .obs { font-size: 12px; text-transform: uppercase; }
-          .info-cliente { font-size: 12px; text-transform: uppercase; margin-bottom: 4px; word-break: break-word; white-space: normal; line-height: 1.2; width: 100%; max-width: 70mm; }
-          .total-final { font-weight: bold; font-size: 15px; text-align: left; margin-top: 10px; border-top: 1px dashed black; padding-top: 5px; }
+          body {
+            font-size: 18px;
+            width: 70mm;
+            margin: 0;
+            padding: 0;
+          }
+          h2 {
+            text-align: center;
+            font-size: 17px;
+            text-transform: uppercase;
+          }
+          .encabezado {
+            text-align: center;
+            font-size: 16px;
+            text-transform: uppercase;
+            margin-bottom: 4px;
+            line-height: 1.4;
+          }
+          .encabezado .nombre-restaurante {
+            font-weight: bold;
+            font-size: 20px;
+          }
+          .linea {
+            border-top: 1px dashed black;
+          }
+          .grupo {
+            margin-top: 5px;
+            margin-bottom: 5px;
+          }
+          .titulo-grupo {
+            font-weight: bold;
+            font-size: 15px;
+            text-transform: uppercase;
+            display: flex;
+          }
+          .plato {
+            font-weight: bold;
+            font-size: 14px;
+            margin-left: 2px;
+            display: flex;
+            text-transform: uppercase;
+          }
+          .plato .Price1 {
+            margin-left: 17px;
+          }
+          .obs {
+            font-size: 12px;
+            text-transform: uppercase;
+          }
+          .info-cliente {
+            font-size: 12px;
+            text-transform: uppercase;
+            margin-bottom: 4px;
+            word-break: break-word;
+            white-space: normal;
+            line-height: 1.2;
+            width: 100%;
+            max-width: 70mm;
+          }
+          .total-final {
+            font-weight: bold;
+            font-size: 15px;
+            text-align: left;
+            margin-top: 10px;
+            border-top: 1px dashed black;
+            padding-top: 5px;
+          }
         </style>
       </head>
       <body>
         <br><br><br>
+        <div class="encabezado">
+          <div class="nombre-restaurante">RESTAURANTE DOÑA LEO</div>
+          <div>NIT: 1098687925-3</div>
+          <div>Tel: 3214895544</div>
+          <div>Direccion: Calle 41 # 14-17</div>
+        </div>
+        <div class="linea"></div>
         <h2>🧾 PEDIDO #${pedido.id || "—"}</h2>
         <div class="linea"></div>
         <div class="info-cliente">
@@ -182,16 +246,20 @@ function imprimirPedido(pedido) {
       lista.forEach((p) => {
         const obs = p.observaciones || {};
         const partes = [];
-        if (Array.isArray(obs.radios) && obs.radios.length > 0) obs.radios.forEach((r) => partes.push(r));
-        if (obs.modos && Object.keys(obs.modos).length > 0) Object.entries(obs.modos).forEach(([ing, sim]) => {
-          if (sim === "+") partes.push(`+ ${ing}`);
-          else if (sim.toLowerCase() === "no") partes.push(`No ${ing}`);
-          else partes.push(`${ing}: ${sim}`);
-        });
-        if (obs.selectores && Object.keys(obs.selectores).length > 0) Object.entries(obs.selectores).forEach(([k, v]) => {
-          if (Array.isArray(v)) v.forEach((val) => partes.push(`${k}: ${val}`));
-          else partes.push(`${k}: ${v}`);
-        });
+
+        if (Array.isArray(obs.radios) && obs.radios.length > 0)
+          obs.radios.forEach((r) => partes.push(r));
+        if (obs.modos && Object.keys(obs.modos).length > 0)
+          Object.entries(obs.modos).forEach(([ing, sim]) => {
+            if (sim === "+") partes.push(`+ ${ing}`);
+            else if (sim.toLowerCase() === "no") partes.push(`No ${ing}`);
+            else partes.push(`${ing}: ${sim}`);
+          });
+        if (obs.selectores && Object.keys(obs.selectores).length > 0)
+          Object.entries(obs.selectores).forEach(([k, v]) => {
+            if (Array.isArray(v)) v.forEach((val) => partes.push(`${k}: ${val}`));
+            else partes.push(`${k}: ${v}`);
+          });
         if (obs.texto && obs.texto.trim() !== "") partes.push(obs.texto.trim());
         if (partes.length === 0) partes.push("Normal");
 
@@ -209,16 +277,20 @@ function imprimirPedido(pedido) {
       const p = lista[0];
       const obs = p.observaciones || {};
       const partes = [];
-      if (Array.isArray(obs.radios) && obs.radios.length > 0) obs.radios.forEach((r) => partes.push(r));
-      if (obs.modos && Object.keys(obs.modos).length > 0) Object.entries(obs.modos).forEach(([ing, sim]) => {
-        if (sim === "+") partes.push(`+ ${ing}`);
-        else if (sim.toLowerCase() === "no") partes.push(`No ${ing}`);
-        else partes.push(`${ing}: ${sim}`);
-      });
-      if (obs.selectores && Object.keys(obs.selectores).length > 0) Object.entries(obs.selectores).forEach(([k, v]) => {
-        if (Array.isArray(v)) v.forEach((val) => partes.push(`${k}: ${val}`));
-        else partes.push(`${k}: ${v}`);
-      });
+
+      if (Array.isArray(obs.radios) && obs.radios.length > 0)
+        obs.radios.forEach((r) => partes.push(r));
+      if (obs.modos && Object.keys(obs.modos).length > 0)
+        Object.entries(obs.modos).forEach(([ing, sim]) => {
+          if (sim === "+") partes.push(`+ ${ing}`);
+          else if (sim.toLowerCase() === "no") partes.push(`No ${ing}`);
+          else partes.push(`${ing}: ${sim}`);
+        });
+      if (obs.selectores && Object.keys(obs.selectores).length > 0)
+        Object.entries(obs.selectores).forEach(([k, v]) => {
+          if (Array.isArray(v)) v.forEach((val) => partes.push(`${k}: ${val}`));
+          else partes.push(`${k}: ${v}`);
+        });
       if (obs.texto && obs.texto.trim() !== "") partes.push(obs.texto.trim());
       if (partes.length === 0) partes.push("Normal");
 
