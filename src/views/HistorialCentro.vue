@@ -211,12 +211,14 @@ function imprimirPedido(pedido) {
         <h2>🧾 PEDIDO #${pedido.id || "—"}</h2>
         <div class="linea"></div>
         <div class="info-cliente">
-          <p><strong>Dirección:</strong> ${pedido.cliente?.direccion || "—"}</p>
-          <p><strong>Cliente:</strong> ${pedido.cliente?.nombre || "Sin nombre"}</p>
-          <p><strong>Tel:</strong> ${pedido.cliente?.telefono || "—"}</p>
+          <p><strong>Dirección:</strong> <strong>${pedido.cliente?.direccion || "—"}</strong></p>
+          <p><strong>Cliente:</strong> <strong>${pedido.cliente?.nombre || "Sin nombre"}</strong></p>
+          <p><strong>Tel:</strong> <strong>${pedido.cliente?.telefono || "—"}</strong></p>
         </div>
         <div class="linea"></div>
   `;
+
+  const limpiar = (txt) => String(txt).replace(/[¿¡?!]/g, "").trim();
 
   const grupos = {};
   pedido.platos.forEach((p) => {
@@ -248,19 +250,19 @@ function imprimirPedido(pedido) {
         const partes = [];
 
         if (Array.isArray(obs.radios) && obs.radios.length > 0)
-          obs.radios.forEach((r) => partes.push(r));
+          obs.radios.forEach((r) => partes.push(limpiar(r)));
         if (obs.modos && Object.keys(obs.modos).length > 0)
           Object.entries(obs.modos).forEach(([ing, sim]) => {
-            if (sim === "+") partes.push(`+ ${ing}`);
-            else if (sim.toLowerCase() === "no") partes.push(`No ${ing}`);
-            else partes.push(`${ing}: ${sim}`);
+            if (sim === "+") partes.push(`+ ${limpiar(ing)}`);
+            else if (sim.toLowerCase() === "no") partes.push(`No ${limpiar(ing)}`);
+            else partes.push(`${limpiar(ing)}: ${limpiar(sim)}`);
           });
         if (obs.selectores && Object.keys(obs.selectores).length > 0)
           Object.entries(obs.selectores).forEach(([k, v]) => {
-            if (Array.isArray(v)) v.forEach((val) => partes.push(`${k}: ${val}`));
-            else partes.push(`${k}: ${v}`);
+            if (Array.isArray(v)) v.forEach((val) => partes.push(`${limpiar(val)} ${limpiar(k)}`));
+            else partes.push(`${limpiar(String(v))} ${limpiar(k)}`);
           });
-        if (obs.texto && obs.texto.trim() !== "") partes.push(obs.texto.trim());
+        if (obs.texto && obs.texto.trim() !== "") partes.push(limpiar(obs.texto));
         if (partes.length === 0) partes.push("Normal");
 
         contenidoTicket += `
@@ -279,19 +281,19 @@ function imprimirPedido(pedido) {
       const partes = [];
 
       if (Array.isArray(obs.radios) && obs.radios.length > 0)
-        obs.radios.forEach((r) => partes.push(r));
+        obs.radios.forEach((r) => partes.push(limpiar(r)));
       if (obs.modos && Object.keys(obs.modos).length > 0)
         Object.entries(obs.modos).forEach(([ing, sim]) => {
-          if (sim === "+") partes.push(`+ ${ing}`);
-          else if (sim.toLowerCase() === "no") partes.push(`No ${ing}`);
-          else partes.push(`${ing}: ${sim}`);
+          if (sim === "+") partes.push(`+ ${limpiar(ing)}`);
+          else if (sim.toLowerCase() === "no") partes.push(`No ${limpiar(ing)}`);
+          else partes.push(`${limpiar(ing)}: ${limpiar(sim)}`);
         });
       if (obs.selectores && Object.keys(obs.selectores).length > 0)
         Object.entries(obs.selectores).forEach(([k, v]) => {
-          if (Array.isArray(v)) v.forEach((val) => partes.push(`${k}: ${val}`));
-          else partes.push(`${k}: ${v}`);
+          if (Array.isArray(v)) v.forEach((val) => partes.push(`${limpiar(val)} ${limpiar(k)}`));
+          else partes.push(`${limpiar(String(v))} ${limpiar(k)}`);
         });
-      if (obs.texto && obs.texto.trim() !== "") partes.push(obs.texto.trim());
+      if (obs.texto && obs.texto.trim() !== "") partes.push(limpiar(obs.texto));
       if (partes.length === 0) partes.push("Normal");
 
       contenidoTicket += `
@@ -307,6 +309,9 @@ function imprimirPedido(pedido) {
 
   contenidoTicket += `
         <div class="total-final">TOTAL: $${totalPedido.toLocaleString("es-CO")}</div>
+        <br>
+        <br>
+        <br>
       </body>
     </html>
   `;

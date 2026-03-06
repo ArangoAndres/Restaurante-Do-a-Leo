@@ -363,6 +363,7 @@ export const OBS_POR_PLATO = {
     items: [
       { label: "¿Frito?", tipo: "radio" },
       { label: "¿Sudado?", tipo: "radio" },
+      { label: "¿Frito Sudado?", tipo: "radio" },
       { label: "¿Arroz de Coco?", tipo: "radio" },
       { label: "Arroz", tipo: "modo" },
       { label: "Ensalada", tipo: "modo" },

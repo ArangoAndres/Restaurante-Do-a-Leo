@@ -8,7 +8,7 @@ export { MENU, OBS_POR_PLATO };
 const RADIO_EXCLUSIVOS = [
   ["¿Sopa Clarita?", "¿Sopa Espesa?"],
   ["¿3/4?", "¿Termino Medio?", "¿Bien asado?"],
-  ["¿Frito?", "¿Sudado?"],
+  ["¿Frito?", "¿Sudado?", "¿Frito Sudado?"],
   ["¿Solo costilla?", "¿Solo Pierna?"],
 ];
 
