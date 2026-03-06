@@ -171,9 +171,9 @@ function imprimirPedido(pedido) {
         <h2>🧾 PEDIDO #${pedido.id || "—"}</h2>
         <div class="linea"></div>
         <div class="info-cliente">
-          <p><strong>Dirección:</strong> ${pedido.cliente?.direccion || "—"}</p>
-          <p><strong>Cliente:</strong> ${pedido.cliente?.nombre || "Sin nombre"}</p>
-          <p><strong>Tel:</strong> ${pedido.cliente?.telefono || "—"}</p>
+          <p><strong>Dirección:</strong> <strong>${pedido.cliente?.direccion || "—"}</strong></p>
+          <p><strong>Cliente:</strong> <strong>${pedido.cliente?.nombre || "Sin nombre"}</strong></p>
+          <p><strong>Tel:</strong> <strong>${pedido.cliente?.telefono || "—"}</strong></p>
         </div>
         <div class="linea"></div>
   `;
@@ -267,6 +267,9 @@ function imprimirPedido(pedido) {
 
   contenidoTicket += `
         <div class="total-final">TOTAL: $${totalPedido.toLocaleString("es-CO")}</div>
+        <br>
+        <br>
+        <br>
       </body>
     </html>
   `;
