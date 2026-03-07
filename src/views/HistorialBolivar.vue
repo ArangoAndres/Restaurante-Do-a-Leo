@@ -321,9 +321,7 @@ function imprimirPedido(pedido) {
 
   contenidoTicket += `
         <div class="total-final">TOTAL: $${totalPedido.toLocaleString("es-CO")}</div>
-        <br>
-        <br>
-        <br>
+        <div style="height: 40px;"></div>
       </body>
     </html>
   `;
