@@ -78,6 +78,7 @@ const cancelar = computed(() =>
 // ── IMPRIMIR ──────────────────────────────────────────────────
 // ── IMPRIMIR ──────────────────────────────────────────────────
 // ── IMPRIMIR ──────────────────────────────────────────────────
+// ── IMPRIMIR ──────────────────────────────────────────────────
 function imprimirPedido(pedido) {
   if (!pedido) return;
 
@@ -269,11 +270,8 @@ function imprimirPedido(pedido) {
   });
 
   contenidoTicket += `
-        <div class="total-final">TOTAL: $${totalPedido.toLocaleString("es-CO")}
-           <br>
-        <br>
-        <br></div>
-       
+        <div class="total-final">TOTAL: $${totalPedido.toLocaleString("es-CO")}</div>
+        <div style="height: 40mm;"></div>
       </body>
     </html>
   `;
