@@ -3,26 +3,26 @@ export const MENU = [
   {
     num: 1,
     name: "Chanfaina",
-    sizes: ["Solo Sopa", "9500", "Normal"],
-    prices: [13000, 9500, 18000],
+    sizes: ["Normal", "9500", "Solo Sopa"], // ["Normal", "9500", "Solo Sopa"]
+    prices: [18000, 9500, 13000], // [18000, 9500, 13000]
   },
   {
     num: 2,
     name: "Mondongo",
-    sizes: ["Solo Sopa", "9500", "Normal"],
-    prices: [13000, 9500, 18000],
+    sizes: ["Normal", "9500", "Solo Sopa"], // ["Normal", "9500", "Solo Sopa"]
+    prices: [18000, 9500, 13000], // [18000, 9500, 13000]
   },
   {
     num: 3,
     name: "Frijoles",
-    sizes: ["Solo Sopa", "9500", "Normal"],
-    prices: [13000, 9500, 18000],
+    sizes: ["Normal", "9500", "Solo Sopa"], // ["Normal", "9500", "Solo Sopa"]
+    prices: [18000, 9500, 13000], // [18000, 9500, 13000]
   },
   {
     num: 4,
     name: "Mute",
-    sizes: ["Solo Sopa", "9500", "Normal"],
-    prices: [18000, 9500, 13000],
+    sizes: ["Normal", "9500", "Solo Sopa"], // ["Normal", "9500", "Solo Sopa"]
+    prices: [18000, 9500, 13000], // [18000, 9500, 13000]
   },
 
   { cat: "SANCOCHO" },
@@ -122,12 +122,12 @@ export const MENU = [
 
   { cat: "ADICIONALES" },
   { num: 48, name: "Porcion Pepitoria", sizes: [], price: [10000] },
-  { num: 33, name: "Papa Frita", sizes: [], price: [9000] },
-  { num: 34, name: "Yuca", sizes: [], price: [5500] },
-  { num: 35, name: "Patacón", sizes: [], price: [5500] },
-  { num: 36, name: "Tajadas", sizes: [], price: [5500] },
-  { num: 37, name: "Ensalada", sizes: [], price: [55000] },
-  { num: 38, name: "Arroz", sizes: [], price: [3500] },
+  { num: 33, name: "Porción de Papa Frita", sizes: [], price: [9000] },
+  { num: 34, name: "Porción de Yuca", sizes: [], price: [5500] },
+  { num: 35, name: "Porción de Patacón", sizes: [], price: [5500] },
+  { num: 36, name: "Porción de Tajadas", sizes: [], price: [5500] },
+  { num: 37, name: "Porción de Ensalada", sizes: [], price: [55000] },
+  { num: 38, name: "Porción de Arroz", sizes: [], price: [3500] },
   { num: 39, name: "Icopor (para llevar)", sizes: [], price: [1000] },
 
   { cat: "BEBIDAS" },
