@@ -130,7 +130,12 @@
 
         <div class="field" v-if="!recogeEnRestaurante">
           <label for="direccion">Dirección de entrega</label>
-          <input type="text" id="direccion" v-model="form.direccion" placeholder="Calle, número, barrio" />
+          <input type="text" id="direccion" v-model="form.direccion" placeholder="Calle, número" />
+        </div>
+
+        <div class="field" v-if="!recogeEnRestaurante">
+          <label for="barrio">Barrio</label>
+          <input type="text" id="barrio" v-model="form.barrio" placeholder="Ej. El Centro, La Esperanza" />
         </div>
 
         <div class="field-check">
@@ -210,6 +215,7 @@
           <p><strong>Cliente:</strong> {{ popupResumen.pedido.cliente.nombre }}</p>
           <p><strong>Tel:</strong> {{ popupResumen.pedido.cliente.telefono }}</p>
           <p><strong>Dirección:</strong> {{ popupResumen.pedido.cliente.direccion }}</p>
+          <p v-if="popupResumen.pedido.cliente.barrio"><strong>Barrio:</strong> {{ popupResumen.pedido.cliente.barrio }}</p>
           <hr style="margin:8px 0;">
         </div>
 
@@ -254,7 +260,7 @@
           {{ MENU[popup.itemIndex].name }}
           <template v-if="selections[popup.itemIndex]?.length > 1">
             — Unidad {{ popup.unitIndex + 1 }}
-          </template>
+          </template> 
         </span>
       </div>
 
@@ -374,41 +380,32 @@ const {
   enviarPedidoFinal,
 } = usePedido();
 
-// -----------------------------
-// Lógica para secciones colapsables
-// -----------------------------
-
-// mapa de índice -> categoría a la que pertenece (basado en el orden del MENU)
 const indexToCategory = [];
 let lastCat = null;
 MENU.forEach((it, idx) => {
   if (it.cat) {
     lastCat = it.cat;
-    indexToCategory[idx] = it.cat; // para la fila de categoría misma
+    indexToCategory[idx] = it.cat;
   } else {
     indexToCategory[idx] = lastCat;
   }
 });
 
-// estado abierto/cerrado por categoría (inicialmente cerradas)
 const openCats = ref({
   ADICIONALES: false,
   BEBIDAS: false,
 });
 
-// helper: verificar si una categoría está abierta
 function isOpen(cat) {
   return !!openCats.value[cat];
 }
 
-// handler: clic en la fila de categoría
 function handleCatClick(cat) {
   if (['ADICIONALES', 'BEBIDAS'].includes(cat)) {
     openCats.value[cat] = !openCats.value[cat];
   }
 }
 
-// helper: decidir si mostrar la fila de plato en el índice i
 function shouldShowDish(i) {
   const cat = indexToCategory[i];
   if (!cat) return true;

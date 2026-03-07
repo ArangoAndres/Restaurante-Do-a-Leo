@@ -8,6 +8,7 @@ export const useEditarPedido = (pedido) => {
     nombre: pedido.cliente.nombre,
     telefono: pedido.cliente.telefono,
     direccion: pedido.cliente.direccion,
+    barrio: pedido.cliente.barrio ?? "", // ← barrio
     formaPago: pedido.formaPago ?? "Efectivo",
   });
 
@@ -112,7 +113,6 @@ export const useEditarPedido = (pedido) => {
   };
 
   // ── GUARDAR CAMBIOS ────────────────────────────────
-  // ── GUARDAR CAMBIOS ────────────────────────────────
   const guardarCambios = async () => {
     const platos = [];
 
@@ -120,15 +120,12 @@ export const useEditarPedido = (pedido) => {
       if (item.cat) return;
 
       selections.value[i].forEach((unidad) => {
-        // 🔥 Buscar precio correspondiente
         let precio = 0;
 
         if (Array.isArray(item.prices) && item.prices.length > 0) {
-          // Si tiene precios por tamaño
           const idx = item.sizes?.indexOf(unidad.size);
           precio = idx >= 0 ? item.prices[idx] : item.prices[0];
         } else if (item.price) {
-          // Si tiene un solo precio fijo
           precio = item.price;
         }
 
@@ -136,7 +133,7 @@ export const useEditarPedido = (pedido) => {
           nombre: item.name,
           size: unidad.size,
           observaciones: unidad.obs,
-          precio, // 💰 Nuevo campo con el valor correspondiente
+          precio,
         });
       });
     });
@@ -151,12 +148,13 @@ export const useEditarPedido = (pedido) => {
 
     const payload = {
       restaurante: pedido.restaurante,
-      formaPago: form.formaPago,
+      formaPago: form.formaPago === "Efectivo" ? "" : form.formaPago, // ← vacío si efectivo
       estado: nuevoEstado,
       cliente: {
         nombre: form.nombre,
         telefono: form.telefono,
         direccion: recogeEnRestaurante.value ? "" : form.direccion,
+        barrio: recogeEnRestaurante.value ? "" : form.barrio, // ← barrio
       },
       platos,
     };

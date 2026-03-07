@@ -39,7 +39,12 @@ export function buildObsText(obs) {
 
 // 🔹 Hook principal del pedido
 export function usePedido() {
-  const form = reactive({ nombre: "", telefono: "", direccion: "" });
+  const form = reactive({
+    nombre: "",
+    telefono: "",
+    direccion: "",
+    barrio: "",
+  });
   const recogeEnRestaurante = ref(false);
   const restauranteSeleccionado = ref("");
   const formaPago = ref("");
@@ -66,7 +71,6 @@ export function usePedido() {
 
   function toggleRadio(label) {
     const grupo = RADIO_EXCLUSIVOS.find((g) => g.includes(label));
-
     if (grupo) {
       popup.temp.radios = popup.temp.radios.filter((r) => !grupo.includes(r));
       if (!popup.temp.radios.includes(label)) {
@@ -126,14 +130,12 @@ export function usePedido() {
         }
       }
     }
-
     selections[popup.itemIndex][popup.unitIndex].obs = {
       radios: [...popup.temp.radios],
       modos: { ...popup.temp.modos },
       selectores: { ...popup.temp.selectores },
       texto: popup.temp.texto,
     };
-
     cerrarPopup();
   }
 
@@ -151,7 +153,6 @@ export function usePedido() {
     const item = MENU[i];
     const actual = selections[i].length;
     const nueva = parseInt(qty) || 0;
-
     if (nueva > actual) {
       for (let j = actual; j < nueva; j++) {
         selections[i].push(crearUnidad(item.sizes || []));
@@ -165,6 +166,7 @@ export function usePedido() {
     form.nombre = "";
     form.telefono = "";
     form.direccion = "";
+    form.barrio = "";
     recogeEnRestaurante.value = false;
     restauranteSeleccionado.value = "";
     formaPago.value = "";
@@ -172,7 +174,7 @@ export function usePedido() {
     cerrarPopup();
   }
 
-  // 🔹 Construir pedido (ACTUALIZADO)
+  // 🔹 Construir pedido
   function construirPedido() {
     const ahora = new Date();
     const platos = [];
@@ -184,14 +186,12 @@ export function usePedido() {
 
       unidades.forEach((u) => {
         let precio = 0;
-
         if (item.prices?.length && item.sizes?.length) {
           const idx = item.sizes.indexOf(u.size);
           precio = idx >= 0 ? item.prices[idx] : item.prices[0];
         } else {
           precio = item.price ? item.price[0] || 0 : 0;
         }
-
         platos.push({
           nombre: item.name,
           size: u.size,
@@ -203,38 +203,48 @@ export function usePedido() {
 
     return {
       fecha: ahora,
-
       cliente: {
         nombre: form.nombre,
         telefono: form.telefono,
         direccion: recogeEnRestaurante.value
           ? "Recoge en restaurante"
           : form.direccion,
+        barrio: recogeEnRestaurante.value ? "" : form.barrio,
       },
-
       formaPago: formaPago.value,
       restaurante: restauranteSeleccionado.value,
-
-      // 🔹 Estado de pago
-      estado: formaPago.value === "Transferencia" ? "Pago pendiente" : "Pago",
-
-      // 🔹 NUEVO: estado del pedido
+      estado: formaPago.value === "Transferencia" ? "Pago pendiente" : "",
       estado_pedido: "Listo",
-
-      // 🔹 NUEVO: razón de cancelación vacía
       razon_cancelacion: null,
-
       platos,
     };
   }
 
   function abrirResumen() {
-    const pedido = construirPedido();
+    // ── Validaciones ──────────────────────────────────
+    if (!form.nombre.trim() || !form.telefono.trim()) {
+      alert("Por favor completa el nombre y teléfono del cliente.");
+      return;
+    }
+    if (!recogeEnRestaurante.value && !form.direccion.trim()) {
+      alert("Por favor ingresa la dirección de entrega.");
+      return;
+    }
+    if (!formaPago.value) {
+      alert("Por favor selecciona un método de pago.");
+      return;
+    }
+    if (!restauranteSeleccionado.value) {
+      alert("Por favor selecciona el restaurante destino.");
+      return;
+    }
 
+    const pedido = construirPedido();
     if (pedido.platos.length === 0) {
       alert("Por favor agrega al menos un plato.");
       return;
     }
+    // ─────────────────────────────────────────────────
 
     popupResumen.pedido = pedido;
     popupResumen.visible = true;
@@ -243,14 +253,11 @@ export function usePedido() {
   async function enviarPedidoFinal() {
     const pedido = popupResumen.pedido;
     if (!pedido) return;
-
     try {
       const response = await api.post("/pedidos", pedido);
       console.log("Respuesta backend:", response.data);
-
       toastVisible.value = true;
       setTimeout(() => (toastVisible.value = false), 3500);
-
       resetForm();
       popupResumen.visible = false;
     } catch (error) {

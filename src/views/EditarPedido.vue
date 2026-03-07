@@ -80,11 +80,7 @@ function volver() {
                       class="unit-size"
                       v-model="unidad.size"
                     >
-                      <option
-                        v-for="s in item.sizes"
-                        :key="s"
-                        :value="s"
-                      >{{ s }}</option>
+                      <option v-for="s in item.sizes" :key="s" :value="s">{{ s }}</option>
                     </select>
 
                     <!-- BOTÓN OBS -->
@@ -134,7 +130,12 @@ function volver() {
 
         <div class="field" v-if="!logica.recogeEnRestaurante.value">
           <label for="direccion">Dirección de entrega</label>
-          <input type="text" id="direccion" v-model="logica.form.direccion" placeholder="Calle, número, barrio" />
+          <input type="text" id="direccion" v-model="logica.form.direccion" placeholder="Calle, número" />
+        </div>
+
+        <div class="field" v-if="!logica.recogeEnRestaurante.value">
+          <label for="barrio">Barrio</label>
+          <input type="text" id="barrio" v-model="logica.form.barrio" placeholder="Ej. El Centro, La Esperanza" />
         </div>
 
         <div class="field-check">

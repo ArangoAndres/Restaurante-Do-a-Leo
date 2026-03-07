@@ -192,7 +192,7 @@ function imprimirPedido(pedido) {
             text-transform: uppercase;
           }
           .info-cliente {
-            font-size: 12px;
+            font-size: 14px;
             text-transform: uppercase;
             margin-bottom: 4px;
             word-break: break-word;
@@ -223,7 +223,9 @@ function imprimirPedido(pedido) {
         <h2>🧾 PEDIDO #${pedido.id || "—"}</h2>
         <div class="linea"></div>
         <div class="info-cliente">
+          <p><strong>Hora:</strong> <strong>${pedido.fecha ? new Date(pedido.fecha).toLocaleTimeString("es-CO", { hour: "2-digit", minute: "2-digit" }) : "—"}</strong></p>
           <p><strong>Dirección:</strong> <strong>${pedido.cliente?.direccion || "—"}</strong></p>
+          <p><strong>Barrio:</strong> <strong>${pedido.cliente?.barrio || "—"}</strong></p>
           <p><strong>Cliente:</strong> <strong>${pedido.cliente?.nombre || "Sin nombre"}</strong></p>
           <p><strong>Tel:</strong> <strong>${pedido.cliente?.telefono || "—"}</strong></p>
         </div>
@@ -231,6 +233,22 @@ function imprimirPedido(pedido) {
   `;
 
   const limpiar = (txt) => String(txt).replace(/[¿¡?!]/g, "").trim();
+
+  const procesarModos = (modos, partes) => {
+    Object.entries(modos).forEach(([ing, sim]) => {
+      if (sim === "+") partes.push(`Más ${limpiar(ing)}`);
+      else if (sim.toLowerCase() === "no") partes.push(`No ${limpiar(ing)}`);
+      else if (sim.toLowerCase() === "solo") partes.push(`Solo ${limpiar(ing)}`);
+      else partes.push(`${limpiar(sim)} ${limpiar(ing)}`);
+    });
+  };
+
+  const procesarSelectores = (selectores, partes) => {
+    Object.entries(selectores).forEach(([k, v]) => {
+      if (Array.isArray(v)) v.forEach((val) => partes.push(`${limpiar(val)} ${limpiar(k)}`));
+      else partes.push(`${limpiar(String(v))} ${limpiar(k)}`);
+    });
+  };
 
   const grupos = {};
   pedido.platos.forEach((p) => {
@@ -264,16 +282,9 @@ function imprimirPedido(pedido) {
         if (Array.isArray(obs.radios) && obs.radios.length > 0)
           obs.radios.forEach((r) => partes.push(limpiar(r)));
         if (obs.modos && Object.keys(obs.modos).length > 0)
-          Object.entries(obs.modos).forEach(([ing, sim]) => {
-            if (sim === "+") partes.push(`+ ${limpiar(ing)}`);
-            else if (sim.toLowerCase() === "no") partes.push(`No ${limpiar(ing)}`);
-            else partes.push(`${limpiar(ing)}: ${limpiar(sim)}`);
-          });
+          procesarModos(obs.modos, partes);
         if (obs.selectores && Object.keys(obs.selectores).length > 0)
-          Object.entries(obs.selectores).forEach(([k, v]) => {
-            if (Array.isArray(v)) v.forEach((val) => partes.push(`${limpiar(val)} ${limpiar(k)}`));
-            else partes.push(`${limpiar(String(v))} ${limpiar(k)}`);
-          });
+          procesarSelectores(obs.selectores, partes);
         if (obs.texto && obs.texto.trim() !== "") partes.push(limpiar(obs.texto));
         if (partes.length === 0) partes.push("Normal");
 
@@ -295,16 +306,9 @@ function imprimirPedido(pedido) {
       if (Array.isArray(obs.radios) && obs.radios.length > 0)
         obs.radios.forEach((r) => partes.push(limpiar(r)));
       if (obs.modos && Object.keys(obs.modos).length > 0)
-        Object.entries(obs.modos).forEach(([ing, sim]) => {
-          if (sim === "+") partes.push(`+ ${limpiar(ing)}`);
-          else if (sim.toLowerCase() === "no") partes.push(`No ${limpiar(ing)}`);
-          else partes.push(`${limpiar(ing)}: ${limpiar(sim)}`);
-        });
+        procesarModos(obs.modos, partes);
       if (obs.selectores && Object.keys(obs.selectores).length > 0)
-        Object.entries(obs.selectores).forEach(([k, v]) => {
-          if (Array.isArray(v)) v.forEach((val) => partes.push(`${limpiar(val)} ${limpiar(k)}`));
-          else partes.push(`${limpiar(String(v))} ${limpiar(k)}`);
-        });
+        procesarSelectores(obs.selectores, partes);
       if (obs.texto && obs.texto.trim() !== "") partes.push(limpiar(obs.texto));
       if (partes.length === 0) partes.push("Normal");
 
@@ -325,9 +329,8 @@ function imprimirPedido(pedido) {
           <p>Método de Pago: ${pedido.formaPago}</p>
           <p>Estado del Pago: ${pedido.estado}</p>
           <p>-</p>
-
           <p><strong>¡GRACIAS POR SU COMPRA!</strong></p>
-          </div>
+        </div>
       </body>
     </html>
   `;

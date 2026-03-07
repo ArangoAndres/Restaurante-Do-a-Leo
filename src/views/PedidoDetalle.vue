@@ -76,9 +76,6 @@ const cancelar = computed(() =>
 );
 
 // ── IMPRIMIR ──────────────────────────────────────────────────
-// ── IMPRIMIR ──────────────────────────────────────────────────
-// ── IMPRIMIR ──────────────────────────────────────────────────
-// ── IMPRIMIR ──────────────────────────────────────────────────
 function imprimirPedido(pedido) {
   if (!pedido) return;
 
@@ -175,6 +172,7 @@ function imprimirPedido(pedido) {
         <div class="info-cliente">
           <p><strong>Hora:</strong> <strong>${pedido.fecha ? new Date(pedido.fecha).toLocaleTimeString("es-CO", { hour: "2-digit", minute: "2-digit" }) : "—"}</strong></p>
           <p><strong>Dirección:</strong> <strong>${pedido.cliente?.direccion || "—"}</strong></p>
+          <p><strong>Barrio:</strong> <strong>${pedido.cliente?.barrio || "—"}</strong></p>
           <p><strong>Cliente:</strong> <strong>${pedido.cliente?.nombre || "Sin nombre"}</strong></p>
           <p><strong>Tel:</strong> <strong>${pedido.cliente?.telefono || "—"}</strong></p>
         </div>
@@ -312,6 +310,7 @@ function imprimirPedido(pedido) {
         <p><strong>Nombre:</strong> {{ pedido.cliente.nombre }}</p>
         <p><strong>Celular:</strong> {{ pedido.cliente.telefono }}</p>
         <p><strong>Dirección:</strong> {{ pedido.cliente.direccion }}</p>
+        <p><strong>Barrio:</strong>{{pedido.cliente.barrio}}</p>
         <p><strong>Forma Pago:</strong> {{ pedido.formaPago }}</p>
         <p>
           <strong>Estado:</strong>

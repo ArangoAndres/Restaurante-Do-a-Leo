@@ -63,6 +63,7 @@ const formatHora = (fecha) => {
         <p><strong>Nombre:</strong> {{ pedido.cliente.nombre }}</p>
         <p><strong>Celular:</strong> {{ pedido.cliente.telefono }}</p>
         <p><strong>Dirección:</strong> {{ pedido.cliente.direccion }}</p>
+         <p v-if="popupResumen.pedido.cliente.barrio"><strong>Barrio:</strong> {{ popupResumen.pedido.cliente.barrio }}</p>
         <p><strong>Forma Pago:</strong> {{ pedido.formaPago }}</p>
         <p><strong>Estado:</strong> {{ pedido.estado }}</p>
         <p>
