@@ -272,6 +272,8 @@ function imprimirPedido(pedido) {
   contenidoTicket += `
         <div class="total-final">TOTAL: $${totalPedido.toLocaleString("es-CO")}</div>
         <div>
+          <p>Método de Pago: ${pedido.formaPago}</p>
+          <p>Estado del Pago: ${pedido.estado}</p>
           <p>-</p>
 
           <p><strong>¡GRACIAS POR SU COMPRA!</strong></p>
