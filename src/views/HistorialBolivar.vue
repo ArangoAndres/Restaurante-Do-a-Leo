@@ -321,7 +321,13 @@ function imprimirPedido(pedido) {
 
   contenidoTicket += `
         <div class="total-final">TOTAL: $${totalPedido.toLocaleString("es-CO")}</div>
-        <div style="height: 40px;"></div>
+        <div>
+          <p>-</p>
+          <p>-</p>
+          <p>-</p>
+          <p>-</p>
+          <p><strong>¡GRACIAS POR SU COMPRA!</strong></p>
+          </div>
       </body>
     </html>
   `;
@@ -335,7 +341,6 @@ function imprimirPedido(pedido) {
     setTimeout(() => document.body.removeChild(iframe), 1000);
   }, 300);
 }
-
 /* ============================
    AUTO-IMPRIMIR NUEVOS PEDIDOS
 ============================ */
