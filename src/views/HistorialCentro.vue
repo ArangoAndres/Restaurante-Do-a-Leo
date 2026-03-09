@@ -212,8 +212,8 @@ function imprimirPedido(pedido) {
         <div class="linea"></div>
         <div class="info-cliente">
           <p><strong>Hora:</strong> <strong>${pedido.fecha ? new Date(pedido.fecha).toLocaleTimeString("es-CO", { hour: "2-digit", minute: "2-digit" }) : "—"}</strong></p>
-          <p><strong>Dirección:</strong> <strong>${pedido.cliente?.direccion || "—"}</strong></p>
           <p><strong>Barrio:</strong> <strong>${pedido.cliente?.barrio || "—"}</strong></p>
+          <p><strong>Dirección:</strong> <strong>${pedido.cliente?.direccion || "—"}</strong></p>
           <p><strong>Cliente:</strong> <strong>${pedido.cliente?.nombre || "Sin nombre"}</strong></p>
           <p><strong>Tel:</strong> <strong>${pedido.cliente?.telefono || "—"}</strong></p>
         </div>

@@ -70,10 +70,8 @@ export const OBS_POR_PLATO = {
     permitirTexto: true,
     items: [
       {
-        label: "Tipo de Sopa",
-        tipo: "selector",
-        opciones: ["Sancocho", "Arroz"],
-        requerido: true,
+        label: "¿Sopa de arroz?",
+        tipo: "radio",
       },
       { label: "¿Sopa Clarita?", tipo: "radio" },
       { label: "¿Sopa Espesa?", tipo: "radio" },
@@ -84,10 +82,8 @@ export const OBS_POR_PLATO = {
     permitirTexto: true,
     items: [
       {
-        label: "Tipo de Sopa",
-        tipo: "selector",
-        opciones: ["Sancocho", "Arroz"],
-        requerido: true,
+        label: "¿Sopa de arroz?",
+        tipo: "radio",
       },
       { label: "¿Sopa Clarita?", tipo: "radio" },
       { label: "¿Sopa Espesa?", tipo: "radio" },
@@ -98,10 +94,8 @@ export const OBS_POR_PLATO = {
     permitirTexto: true,
     items: [
       {
-        label: "Tipo de Sopa",
-        tipo: "selector",
-        opciones: ["Sancocho", "Arroz"],
-        requerido: true,
+        label: "¿Sopa de arroz?",
+        tipo: "radio",
       },
       { label: "¿Sopa Clarita?", tipo: "radio" },
       { label: "¿Sopa Espesa?", tipo: "radio" },
@@ -112,10 +106,8 @@ export const OBS_POR_PLATO = {
     permitirTexto: true,
     items: [
       {
-        label: "Tipo de Sopa",
-        tipo: "selector",
-        opciones: ["Sancocho", "Arroz"],
-        requerido: true,
+        label: "¿Sopa de arroz?",
+        tipo: "radio",
       },
       { label: "¿Sopa Clarita?", tipo: "radio" },
       { label: "¿Sopa Espesa?", tipo: "radio" },
@@ -145,10 +137,8 @@ export const OBS_POR_PLATO = {
     permitirTexto: true,
     items: [
       {
-        label: "Tipo de Sopa",
-        tipo: "selector",
-        opciones: ["Arroz", "Sancocho"],
-        requerido: true,
+        label: "¿Sancocho?",
+        tipo: "radio",
       },
       { label: "¿Sopa Clarita?", tipo: "radio" },
       { label: "¿Sopa Espesa?", tipo: "radio" },
