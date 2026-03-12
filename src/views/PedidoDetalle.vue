@@ -3,6 +3,10 @@ import { computed, ref } from "vue";
 import { DetallePedido } from "../assets/js/detallePedido.js";
 import { actualizarEstadoPago } from "../assets/js/actualizarEstadoPago.js";
 import { cancelarPedido } from "../assets/js/cancelarPedido.js";
+import bellsound from "../components/icons/bell_Cortado.mp3";
+
+const sonidoImprimir = new Audio(bellsound);
+
 
 function volver() {
   window.history.back();
@@ -285,11 +289,24 @@ function imprimirPedido(pedido) {
   iframe.contentDocument.write(contenidoTicket);
   iframe.contentDocument.close();
 
-  setTimeout(() => {
-    iframe.contentWindow.focus();
-    iframe.contentWindow.print();
-    setTimeout(() => document.body.removeChild(iframe), 1000);
-  }, 300);
+setTimeout(() => {
+  iframe.contentWindow.focus();
+
+  // 🔔 sonido
+  sonidoImprimir.currentTime = 0;
+
+  sonidoImprimir.play().then(() => {
+    setTimeout(() => {
+      sonidoImprimir.pause();
+      sonidoImprimir.currentTime = 0;
+    }, 4000);
+  });
+
+  iframe.contentWindow.print();
+
+  setTimeout(() => document.body.removeChild(iframe), 1000);
+
+}, 300);
 }
 </script>
 

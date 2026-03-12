@@ -98,6 +98,9 @@ import { ref, onMounted } from "vue"
 import { useRouter } from "vue-router"
 import { usePedidos } from "../assets/js/Historial.js"
 import { obtenerResumenDelDiaCentro } from "../assets/js/ResumenCentro.js"
+import bellsound from "../components/icons/bell_Cortado.mp3";
+
+const sonidoImprimir = new Audio(bellsound);
 
 const router = useRouter()
 const { pedidos, onNuevoPedido } = usePedidos()
@@ -327,18 +330,40 @@ function imprimirPedido(pedido) {
   iframe.contentDocument.close();
 
   setTimeout(() => {
-    iframe.contentWindow.focus();
-    iframe.contentWindow.print();
-    setTimeout(() => document.body.removeChild(iframe), 1000);
-  }, 300);
+
+    iframe.contentWindow.focus()
+
+    /* 🔔 SONIDO */
+    sonidoImprimir.currentTime = 0
+    sonidoImprimir.play().catch(() => {})
+
+    /* 🖨 IMPRIMIR */
+    iframe.contentWindow.print()
+
+    setTimeout(() => {
+      document.body.removeChild(iframe)
+    }, 1000)
+
+  }, 300)
 }
 
 onMounted(() => {
+
+  /* desbloquear audio del navegador */
+  document.addEventListener("click", () => {
+
+    sonidoImprimir.play()
+    sonidoImprimir.pause()
+    sonidoImprimir.currentTime = 0
+
+  }, { once: true })
+
   if (onNuevoPedido) {
     onNuevoPedido.value = (pedido) => {
       imprimirPedido(pedido)
     }
   }
+
 })
 
 // ── RESUMEN DEL DÍA ──────────────────────────────────────────
@@ -351,5 +376,7 @@ async function mostrarResumen() {
   resumen.value = lista
   totalDia.value = totalGeneral
   popupResumenDia.value = true
+
+  
 }
 </script>
