@@ -3,26 +3,26 @@ export const MENU = [
   {
     num: 1,
     name: "Chanfaina",
-    sizes: ["Normal", "9500", "Solo Sopa"], // ["Normal", "9500", "Solo Sopa"]
-    prices: [18000, 9500, 13000], // [18000, 9500, 13000]
+    sizes: ["", "9500", "Solo Sopa"], // ["Normal", "9500", "Solo Sopa"]
+    prices: [18000, 9500, 13500], // [18000, 9500, 13000]
   },
   {
     num: 2,
     name: "Mondongo",
-    sizes: ["Normal", "9500", "Solo Sopa"], // ["Normal", "9500", "Solo Sopa"]
-    prices: [18000, 9500, 13000], // [18000, 9500, 13000]
+    sizes: ["", "9500", "Solo Sopa"], // ["Normal", "9500", "Solo Sopa"]
+    prices: [18000, 9500, 13500], // [18000, 9500, 13000]
   },
   {
     num: 3,
     name: "Frijoles",
-    sizes: ["Normal", "9500", "Solo Sopa"], // ["Normal", "9500", "Solo Sopa"]
-    prices: [18000, 9500, 13000], // [18000, 9500, 13000]
+    sizes: ["", "9500", "Solo Sopa"], // ["Normal", "9500", "Solo Sopa"]
+    prices: [18000, 9500, 13500], // [18000, 9500, 13000]
   },
   {
     num: 4,
     name: "Mute",
-    sizes: ["Normal", "9500", "Solo Sopa"], // ["Normal", "9500", "Solo Sopa"]
-    prices: [18000, 9500, 13000], // [18000, 9500, 13000]
+    sizes: ["", "9500", "Solo Sopa"], // ["Normal", "9500", "Solo Sopa"]
+    prices: [18000, 9500, 13500], // [18000, 9500, 13000]
   },
 
   { cat: "SANCOCHO" },
