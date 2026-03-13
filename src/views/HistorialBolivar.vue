@@ -216,6 +216,8 @@ function imprimirPedido(pedido) {
             width: 100%;
             max-width: 70mm;
           }
+            .linea_grupos{
+            border-top: 1px black;}
           .total-final {
             font-weight: bold;
             font-size: 15px;
@@ -285,8 +287,10 @@ function imprimirPedido(pedido) {
       contenidoTicket += `
         <div class="grupo">
           <div class="titulo-grupo">
-            <span>${nombreBase}${size ? " - " + size : ""} x${cantidad}</span>
+            <span>${nombreBase}${size ? " - " + size : ""}-- x${cantidad} -- </span>
+           
             <span class="Price1">$${subtotalGrupo.toLocaleString("es-CO")}</span>
+           <div class="linea_grupos"></div>
           </div>
       `;
 

@@ -182,6 +182,9 @@ function imprimirPedido(pedido) {
             font-size: 12px;
             text-transform: uppercase;
           }
+            .linea_grupos{
+            border-top: 1px black;}
+            
           .info-cliente {
             font-size: 14px;
             text-transform: uppercase;
@@ -259,10 +262,12 @@ function imprimirPedido(pedido) {
 
     if (cantidad > 1) {
       contenidoTicket += `
-        <div class="grupo">
+         <div class="grupo">
           <div class="titulo-grupo">
-            <span>${nombreBase}${size ? " - " + size : ""} x${cantidad}</span>
+            <span>${nombreBase}${size ? " - " + size : ""}-- x${cantidad} -- </span>
+           
             <span class="Price1">$${subtotalGrupo.toLocaleString("es-CO")}</span>
+           <div class="linea_grupos"></div>
           </div>
       `;
 

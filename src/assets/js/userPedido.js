@@ -6,7 +6,7 @@ export { MENU, OBS_POR_PLATO };
 
 // 🔹 Radios que son mutuamente excluyentes
 const RADIO_EXCLUSIVOS = [
-  ["¿Sopa Clarita?", "¿Sopa Espesa?"],
+  ["¿Sopa Clarita?", "¿Sopa Espesa?", "¿Sancocho?", "¿Sopa de arroz?"],
   ["¿3/4?", "¿Termino Medio?", "¿Bien asado?"],
   ["¿Frito?", "¿Sudado?", "¿Frito Sudado?"],
   ["¿Solo costilla?", "¿Solo Pierna?"],
