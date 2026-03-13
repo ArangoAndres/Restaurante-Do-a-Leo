@@ -184,7 +184,7 @@ function imprimirPedido(pedido) {
           }
             .linea_grupos{
             border-top: 1px black;}
-            
+
           .info-cliente {
             font-size: 14px;
             text-transform: uppercase;
@@ -282,7 +282,7 @@ function imprimirPedido(pedido) {
         if (obs.selectores && Object.keys(obs.selectores).length > 0)
           procesarSelectores(obs.selectores, partes);
         if (obs.texto && obs.texto.trim() !== "") partes.push(limpiar(obs.texto));
-        if (partes.length === 0) partes.push("Normal");
+        if (partes.length === 0) partes.push("-");
 
         contenidoTicket += `
           <div class="plato">
@@ -306,7 +306,7 @@ function imprimirPedido(pedido) {
       if (obs.selectores && Object.keys(obs.selectores).length > 0)
         procesarSelectores(obs.selectores, partes);
       if (obs.texto && obs.texto.trim() !== "") partes.push(limpiar(obs.texto));
-      if (partes.length === 0) partes.push("Normal");
+      if (partes.length === 0) partes.push("-");
 
       contenidoTicket += `
         <div class="plato">

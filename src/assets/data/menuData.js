@@ -32,14 +32,14 @@ export const MENU = [
     num: 7,
     name: "Sancocho de Gallina",
     sizes: ["Media", "Completa"],
-    prices: [30000, 40000],
+    prices: [30000, 44000],
   },
   { num: 8, name: "Sancocho Trifásico", sizes: [], price: [48000] },
   {
     num: 9,
     name: "S. Arroz con Gallina",
     sizes: ["Media", "Completa"],
-    prices: [30000, 40000],
+    prices: [30000, 44000],
   },
   {
     num: 10,

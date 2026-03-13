@@ -241,7 +241,7 @@ function imprimirPedido(pedido) {
         if (obs.selectores && Object.keys(obs.selectores).length > 0)
           procesarSelectores(obs.selectores, partes);
         if (obs.texto && obs.texto.trim() !== "") partes.push(limpiar(obs.texto));
-        if (partes.length === 0) partes.push("Normal");
+        if (partes.length === 0) partes.push("-");
 
         contenidoTicket += `
           <div class="plato">
@@ -265,7 +265,7 @@ function imprimirPedido(pedido) {
       if (obs.selectores && Object.keys(obs.selectores).length > 0)
         procesarSelectores(obs.selectores, partes);
       if (obs.texto && obs.texto.trim() !== "") partes.push(limpiar(obs.texto));
-      if (partes.length === 0) partes.push("Normal");
+      if (partes.length === 0) partes.push("-");
 
       contenidoTicket += `
         <div class="plato">
