@@ -15,7 +15,7 @@ export function DetallePedido() {
 
     try {
       const { id } = route.params;
-      const { data } = await api.get(`/pedidos/bolivar/${id}`);
+      const { data } = await api.get(`/pedidos/bolivar/${id}?t=${Date.now()}`);
       pedido.value = data;
     } catch (err) {
       error.value = "Error cargando el pedido";

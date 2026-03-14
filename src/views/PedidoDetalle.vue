@@ -163,6 +163,9 @@ function imprimirPedido(pedido) {
             border-top: 1px dashed black;
             padding-top: 5px;
           }
+            .Hora_tam{
+            font-size:20px;
+            }
         </style>
       </head>
       <body>
@@ -177,15 +180,15 @@ function imprimirPedido(pedido) {
         <h2>🧾 PEDIDO #${pedido.id || "—"}</h2>
         <div class="linea"></div>
         <div class="info-cliente">
-          <p><strong>Hora:</strong> <strong>${pedido.fecha ? new Date(pedido.fecha).toLocaleTimeString("es-CO", { hour: "2-digit", minute: "2-digit" }) : "—"}</strong></p>
+          <p><strong>Hora:</strong> <strong class="Hora_tam">${pedido.fecha ? new Date(pedido.fecha).toLocaleTimeString("es-CO", { hour: "2-digit", minute: "2-digit" }) : "—"}</strong></p>
           <p><strong>Barrio:</strong> <strong>${pedido.cliente?.barrio || "—"}</strong></p>
           <p><strong>Dirección:</strong> <strong>${pedido.cliente?.direccion || "—"}</strong></p>
           <p><strong>Cliente:</strong> <strong>${pedido.cliente?.nombre || "Sin nombre"}</strong></p>
           <p><strong>Tel:</strong> <strong>${pedido.cliente?.telefono || "—"}</strong></p>
         </div>
         <div class="linea"></div>
-        <p style="font-size:10px">@@@@@@@@@@@@@@@@@@@@</p>
-         <p style="font-size:10px">@@@@@@@@@@@@@@@@@@</p>
+        <p style="font-size:10px">@@@@@@@@@@@@@@@@@@@@@@@@@@@@@</p>
+         <p style="font-size:10px">@@@@@@@@@@@@@@@@@@@@@@@@@@@</p>
   `;
 
   const limpiar = (txt) => String(txt).replace(/[¿¡?!]/g, "").trim();
@@ -283,8 +286,8 @@ function imprimirPedido(pedido) {
   });
 
   contenidoTicket += `
-    <p style="font-size:10px">@@@@@@@@@@@@@@@@@@</p>
-        <p style="font-size:10px">@@@@@@@@@@@@@@@@@@@@</p>
+<p style="font-size:10px">@@@@@@@@@@@@@@@@@@@@@@@@@@@</p>
+<p style="font-size:10px">@@@@@@@@@@@@@@@@@@@@@@@@@@@@@</p>
         <div class="total-final">TOTAL: $${totalPedido.toLocaleString("es-CO")}</div>
         <div>
           <p>Método de Pago: ${pedido.formaPago}</p>
