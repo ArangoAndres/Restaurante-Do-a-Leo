@@ -1,4 +1,4 @@
-import { ref, onMounted } from "vue";
+import { ref, onMounted, watch } from "vue";
 import { useRoute } from "vue-router";
 import { api } from "./api";
 
@@ -26,6 +26,14 @@ export function DetallePedido() {
   };
 
   onMounted(fetchDetalle);
+
+  // 🔴 ESTA ES LA SOLUCIÓN
+  watch(
+    () => route.params.id,
+    () => {
+      fetchDetalle();
+    },
+  );
 
   return {
     pedido,
