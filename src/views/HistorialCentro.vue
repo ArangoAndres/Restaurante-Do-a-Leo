@@ -224,6 +224,8 @@ function imprimirPedido(pedido) {
           <p><strong>Tel:</strong> <strong>${pedido.cliente?.telefono || "—"}</strong></p>
         </div>
         <div class="linea"></div>
+               <p style="font-size:10px">@@@@@@@@@@@@@@@@@@@@</p>
+         <p style="font-size:10px">@@@@@@@@@@@@@@@@@@</p>
   `;
 
   const limpiar = (txt) => String(txt).replace(/[¿¡?!]/g, "").trim();
@@ -320,6 +322,8 @@ function imprimirPedido(pedido) {
   });
 
   contenidoTicket += `
+      <p style="font-size:10px">@@@@@@@@@@@@@@@@@@</p>
+        <p style="font-size:10px">@@@@@@@@@@@@@@@@@@@@</p>
         <div class="total-final">TOTAL: $${totalPedido.toLocaleString("es-CO")}</div>
         <div>
           <p>Método de Pago: ${pedido.formaPago}</p>
