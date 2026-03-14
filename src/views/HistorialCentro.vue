@@ -182,8 +182,8 @@ function imprimirPedido(pedido) {
             font-size: 12px;
             text-transform: uppercase;
           }
-            .linea_grupos{
-            border-top: 1px black;}
+          .linea_grupos{
+            border-top: 1px solid black;}
 
           .info-cliente {
             font-size: 14px;
@@ -267,8 +267,8 @@ function imprimirPedido(pedido) {
             <span>${nombreBase}${size ? " - " + size : ""}-- x${cantidad} -- </span>
            
             <span class="Price1">$${subtotalGrupo.toLocaleString("es-CO")}</span>
-           <div class="linea_grupos"></div>
-          </div>
+            </div>
+            <div class="linea_grupos"></div>
       `;
 
       lista.forEach((p) => {

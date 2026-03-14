@@ -1,6 +1,6 @@
 <template>
   <AppHeader />
-  <RouterView />
+  <RouterView :key="$route.fullPath"/>
 </template>
 
 <script setup>
