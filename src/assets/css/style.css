@@ -889,3 +889,177 @@ table.menu-table {
   border-top: 2px solid var(--gray-border);
   background: #fff;
 }
+
+/* ===== BOTÓN FLOTANTE ===== */
+.floating-btn {
+  position: fixed;
+  bottom: 25px;
+  right: 25px;
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  border: 2px solid var(--black);
+  background: var(--yellow);
+  color: var(--black);
+  font-size: 1.6rem;
+  cursor: pointer;
+  z-index: 1100;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  box-shadow: 0 6px 18px rgba(0,0,0,0.25);
+  transition: transform .15s, background .15s;
+}
+
+.floating-btn:hover {
+  background: var(--yellow-dark);
+  transform: scale(1.08);
+}
+
+.floating-btn:active {
+  transform: scale(0.95);
+}
+/* ═══════════════════════════════════════
+   CORRIENTE — SECCIÓN EN TABLA
+═══════════════════════════════════════ */
+
+.cat-row--corriente td {
+  background: #1a6e3e !important;
+  color: #fff !important;
+  border-top: 2px solid #0d3d22;
+  border-bottom: 1px solid #0d3d22;
+}
+
+.dish-row--corriente td {
+  background: #f0faf4;
+}
+.dish-row--corriente:hover { background: #e3f5eb !important; }
+
+.corriente-badge {
+  display: inline-block;
+  font-size: .62rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .5px;
+  background: #1a6e3e;
+  color: #fff;
+  border-radius: 3px;
+  padding: 1px 6px;
+  margin-right: 5px;
+  vertical-align: middle;
+}
+
+.corriente-precio {
+  font-weight: 700;
+  color: #1a6e3e;
+  font-size: .9rem;
+}
+
+.corriente-empty {
+  text-align: center;
+  padding: 16px !important;
+  color: #888;
+  font-size: .88rem;
+  font-style: italic;
+}
+
+/* ═══════════════════════════════════════
+   POPUP PROTEÍNAS — TOGGLES ESTILO IMAGEN
+═══════════════════════════════════════ */
+
+.popup-proteinas {
+  max-width: 480px;
+}
+
+.popup-proteinas-body {
+  padding: 0 !important;
+  gap: 0 !important;
+  max-height: 65vh;
+  overflow-y: auto;
+}
+
+.proteina-cat-header {
+  background: var(--black);
+  color: var(--yellow);
+  font-size: .72rem;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  padding: 8px 16px;
+  position: sticky;
+  top: 0;
+  z-index: 2;
+}
+
+.proteina-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--gray-border);
+  cursor: pointer;
+  transition: background .15s;
+  user-select: none;
+}
+.proteina-row:last-of-type { border-bottom: none; }
+.proteina-row:hover { background: #fffbe6; }
+.proteina-row--activa { background: #f0faf4 !important; }
+
+.proteina-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.proteina-nombre {
+  font-size: .95rem;
+  font-weight: 600;
+  color: var(--black);
+  text-transform: uppercase;
+  letter-spacing: .3px;
+}
+.proteina-precio {
+  font-size: .8rem;
+  font-weight: 600;
+  color: #1a6e3e;
+}
+
+/* Toggle switch igual que la imagen */
+.proteina-toggle {
+  width: 56px;
+  height: 28px;
+  border-radius: 14px;
+  background: #ccc;
+  border: 2px solid #aaa;
+  position: relative;
+  transition: background .2s, border-color .2s;
+  flex-shrink: 0;
+}
+.proteina-toggle--on {
+  background: #6abf69;
+  border-color: #4caf50;
+}
+.proteina-toggle-knob {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: white;
+  box-shadow: 0 1px 4px rgba(0,0,0,.25);
+  transition: transform .2s;
+}
+.proteina-toggle--on .proteina-toggle-knob {
+  transform: translateX(28px);
+}
+
+/* Contador en footer del popup */
+.proteinas-count {
+  font-size: .85rem;
+  font-weight: 600;
+  color: #555;
+  align-self: center;
+  flex: 1;
+}
