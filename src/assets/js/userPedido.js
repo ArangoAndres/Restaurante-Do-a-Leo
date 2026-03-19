@@ -20,7 +20,6 @@ function crearUnidad(sizes) {
   };
 }
 
-// Crea una unidad de obs vacía para corriente
 function crearObsCorriente() {
   return { radios: [], modos: {}, selectores: {}, texto: "" };
 }
@@ -39,6 +38,35 @@ export function buildObsText(obs) {
   return partes.join(", ");
 }
 
+// ─── Persistencia diaria en localStorage ─────────────────────
+const STORAGE_KEY = "corriente_del_dia";
+
+function guardarCorriente(proteinasSet, selecciones) {
+  const hoy = new Date().toISOString().slice(0, 10);
+  localStorage.setItem(STORAGE_KEY, JSON.stringify({
+    fecha: hoy,
+    proteinasActivas: [...proteinasSet],
+    corrienteSelections: selecciones,
+  }));
+}
+
+function cargarCorriente() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) return null;
+    const data = JSON.parse(raw);
+    const hoy = new Date().toISOString().slice(0, 10);
+    if (data.fecha !== hoy) {
+      localStorage.removeItem(STORAGE_KEY);
+      return null;
+    }
+    return data;
+  } catch {
+    return null;
+  }
+}
+
+// ─── Hook principal ───────────────────────────────────────────
 export function usePedido() {
   const form = reactive({ nombre: "", telefono: "", direccion: "", barrio: "" });
   const recogeEnRestaurante = ref(false);
@@ -47,11 +75,15 @@ export function usePedido() {
   const toastVisible = ref(false);
   const selections = reactive(MENU.map(() => []));
 
-  // ─── Corriente ───────────────────────────────────────────────
-  // Cada proteína: { nombre, precio, unidades: [ { obs } ] }
-  // unidades.length === cantidad pedida
-  const proteinasActivas = ref(new Set());
-  const corrienteSelections = ref([]);
+  // ─── Corriente — carga desde localStorage si es hoy ──────────
+  const guardado = cargarCorriente();
+
+  const proteinasActivas = ref(
+    guardado ? new Set(guardado.proteinasActivas) : new Set()
+  );
+  const corrienteSelections = ref(
+    guardado ? guardado.corrienteSelections : []
+  );
 
   function toggleProteina(proteina) {
     const key = proteina.nombre;
@@ -66,43 +98,41 @@ export function usePedido() {
       corrienteSelections.value.push({
         nombre: proteina.nombre,
         precio: proteina.precio,
-        unidades: [], // inicia vacío = cantidad 0
+        unidades: [],
       });
     }
     proteinasActivas.value = set;
+    guardarCorriente(proteinasActivas.value, corrienteSelections.value);
   }
 
   function isProteinaActiva(proteina) {
     return proteinasActivas.value.has(proteina.nombre);
   }
 
-  // Ajusta el array de unidades igual que updateQty para platos normales
   function updateQtyCorriente(idx, nuevaCant) {
     const val = parseInt(nuevaCant) || 0;
     const item = corrienteSelections.value[idx];
-
     if (val < 0) return;
-
     const actual = item.unidades.length;
     if (val > actual) {
-      for (let j = actual; j < val; j++) {
-        item.unidades.push(crearObsCorriente());
-      }
+      for (let j = actual; j < val; j++) item.unidades.push(crearObsCorriente());
     } else {
       item.unidades.splice(val);
     }
+    guardarCorriente(proteinasActivas.value, corrienteSelections.value);
   }
 
   function limpiarTodasProteinas() {
     proteinasActivas.value = new Set();
     corrienteSelections.value = [];
+    guardarCorriente(proteinasActivas.value, corrienteSelections.value);
   }
 
   // ─── Popup observaciones ─────────────────────────────────────
   const popup = reactive({
     visible: false,
     itemIndex: null,
-    unitIndex: null,  // para corriente: índice dentro de unidades[]
+    unitIndex: null,
     esCorriente: false,
     temp: { radios: [], modos: {}, selectores: {}, texto: "" },
   });
@@ -155,7 +185,6 @@ export function usePedido() {
     popup.visible = true;
   }
 
-  // Ahora abre obs de una unidad específica dentro del corriente
   function abrirPopupCorriente(corrienteIdx, unidadIdx) {
     popup.itemIndex = corrienteIdx;
     popup.unitIndex = unidadIdx;
@@ -186,6 +215,7 @@ export function usePedido() {
         selectores: { ...popup.temp.selectores },
         texto: popup.temp.texto,
       };
+      guardarCorriente(proteinasActivas.value, corrienteSelections.value);
       cerrarPopup();
       return;
     }
@@ -239,11 +269,12 @@ export function usePedido() {
     restauranteSeleccionado.value = "";
     formaPago.value = "";
     MENU.forEach((_, i) => (selections[i] = []));
-    // Mantiene proteínas activas, resetea unidades a [] (cantidad 0) y limpia obs
+    // Mantiene proteínas activas del día, resetea unidades a [] y limpia obs
     corrienteSelections.value = corrienteSelections.value.map((c) => ({
       ...c,
       unidades: [],
     }));
+    guardarCorriente(proteinasActivas.value, corrienteSelections.value);
     cerrarPopup();
   }
 
@@ -265,7 +296,6 @@ export function usePedido() {
       });
     });
 
-    // Una entrada por unidad dentro de cada corriente
     corrienteSelections.value.forEach((c) => {
       c.unidades.forEach((u) => {
         platos.push({
