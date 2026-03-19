@@ -7,11 +7,10 @@ import { api } from "./api.js";
 export { MENU, OBS_POR_PLATO, PROTEINAS_CORRIENTE, OBS_CORRIENTE };
 
 const RADIO_EXCLUSIVOS = [
-  ["¿Sopa Clarita?", "¿Sopa Espesa?", "¿Sancocho?", "¿Sopa de arroz?", "¿No sopa?", "¿Frijol?"],
+  ["¿Sopa Clarita?", "¿Sopa Espesa?", "¿Sancocho?", "¿Sopa de arroz?", "¿No sopa?"],
   ["¿3/4?", "¿Termino Medio?", "¿Bien asado?"],
   ["¿Frito?", "¿Sudado?", "¿Frito Sudado?"],
   ["¿Solo costilla?", "¿Solo Pierna?"],
-
 ];
 
 function crearUnidad(sizes) {
@@ -21,7 +20,8 @@ function crearUnidad(sizes) {
   };
 }
 
-function crearUnidadCorriente() {
+// Crea una unidad de obs vacía para corriente
+function crearObsCorriente() {
   return { radios: [], modos: {}, selectores: {}, texto: "" };
 }
 
@@ -48,9 +48,9 @@ export function usePedido() {
   const selections = reactive(MENU.map(() => []));
 
   // ─── Corriente ───────────────────────────────────────────────
-  // proteinasActivas: Set de claves "categoria|nombre"
+  // Cada proteína: { nombre, precio, unidades: [ { obs } ] }
+  // unidades.length === cantidad pedida
   const proteinasActivas = ref(new Set());
-  // corrienteSelections: array de { nombre, precio, obs }
   const corrienteSelections = ref([]);
 
   function toggleProteina(proteina) {
@@ -66,7 +66,7 @@ export function usePedido() {
       corrienteSelections.value.push({
         nombre: proteina.nombre,
         precio: proteina.precio,
-        obs: crearUnidadCorriente(),
+        unidades: [], // inicia vacío = cantidad 0
       });
     }
     proteinasActivas.value = set;
@@ -76,18 +76,39 @@ export function usePedido() {
     return proteinasActivas.value.has(proteina.nombre);
   }
 
+  // Ajusta el array de unidades igual que updateQty para platos normales
+  function updateQtyCorriente(idx, nuevaCant) {
+    const val = parseInt(nuevaCant) || 0;
+    const item = corrienteSelections.value[idx];
+
+    if (val < 0) return;
+
+    const actual = item.unidades.length;
+    if (val > actual) {
+      for (let j = actual; j < val; j++) {
+        item.unidades.push(crearObsCorriente());
+      }
+    } else {
+      item.unidades.splice(val);
+    }
+  }
+
+  function limpiarTodasProteinas() {
+    proteinasActivas.value = new Set();
+    corrienteSelections.value = [];
+  }
+
   // ─── Popup observaciones ─────────────────────────────────────
   const popup = reactive({
     visible: false,
     itemIndex: null,
-    unitIndex: null,
+    unitIndex: null,  // para corriente: índice dentro de unidades[]
     esCorriente: false,
     temp: { radios: [], modos: {}, selectores: {}, texto: "" },
   });
 
   const popupResumen = reactive({ visible: false, pedido: null });
 
-  // Popup selector proteínas
   const popupProteinas = reactive({ visible: false });
   function abrirPopupProteinas() { popupProteinas.visible = true; }
   function cerrarPopupProteinas() { popupProteinas.visible = false; }
@@ -97,7 +118,6 @@ export function usePedido() {
   }
 
   function toggleRadio(label) {
-    // Buscar en todos los grupos de exclusivos
     const grupo = RADIO_EXCLUSIVOS.find((g) => g.includes(label));
     if (grupo) {
       popup.temp.radios = popup.temp.radios.filter((r) => !grupo.includes(r));
@@ -121,7 +141,6 @@ export function usePedido() {
     popup.temp.modos[label] = modo;
   }
 
-  // Popup obs para platos normales
   function abrirPopup(i, j) {
     popup.itemIndex = i;
     popup.unitIndex = j;
@@ -136,12 +155,12 @@ export function usePedido() {
     popup.visible = true;
   }
 
-  // Popup obs para corriente
-  function abrirPopupCorriente(index) {
-    popup.itemIndex = index;
-    popup.unitIndex = null;
+  // Ahora abre obs de una unidad específica dentro del corriente
+  function abrirPopupCorriente(corrienteIdx, unidadIdx) {
+    popup.itemIndex = corrienteIdx;
+    popup.unitIndex = unidadIdx;
     popup.esCorriente = true;
-    const saved = corrienteSelections.value[index].obs;
+    const saved = corrienteSelections.value[corrienteIdx].unidades[unidadIdx];
     popup.temp = {
       radios: [...(saved.radios || [])],
       modos: { ...(saved.modos || {}) },
@@ -161,7 +180,7 @@ export function usePedido() {
 
   function confirmarPopup() {
     if (popup.esCorriente) {
-      corrienteSelections.value[popup.itemIndex].obs = {
+      corrienteSelections.value[popup.itemIndex].unidades[popup.unitIndex] = {
         radios: [...popup.temp.radios],
         modos: { ...popup.temp.modos },
         selectores: { ...popup.temp.selectores },
@@ -220,10 +239,11 @@ export function usePedido() {
     restauranteSeleccionado.value = "";
     formaPago.value = "";
     MENU.forEach((_, i) => (selections[i] = []));
- corrienteSelections.value = corrienteSelections.value.map((c) => ({
-    ...c,
-    obs: { radios: [], modos: {}, selectores: {}, texto: "" },
-  }));
+    // Mantiene proteínas activas, resetea unidades a [] (cantidad 0) y limpia obs
+    corrienteSelections.value = corrienteSelections.value.map((c) => ({
+      ...c,
+      unidades: [],
+    }));
     cerrarPopup();
   }
 
@@ -245,8 +265,16 @@ export function usePedido() {
       });
     });
 
+    // Una entrada por unidad dentro de cada corriente
     corrienteSelections.value.forEach((c) => {
-      platos.push({ nombre: `[Corriente] ${c.nombre}`, size: "", precio: c.precio, observaciones: { ...c.obs } });
+      c.unidades.forEach((u) => {
+        platos.push({
+          nombre: `[Corriente] ${c.nombre}`,
+          size: "",
+          precio: c.precio,
+          observaciones: { ...u },
+        });
+      });
     });
 
     return {
@@ -295,6 +323,7 @@ export function usePedido() {
     toastVisible, selections,
     corrienteSelections, proteinasActivas,
     toggleProteina, isProteinaActiva,
+    updateQtyCorriente, limpiarTodasProteinas,
     popupProteinas, abrirPopupProteinas, cerrarPopupProteinas,
     popup, popupResumen,
     haySolo, toggleRadio, toggleModo, toggleSelector,

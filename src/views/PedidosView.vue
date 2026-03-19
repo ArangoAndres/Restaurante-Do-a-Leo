@@ -17,6 +17,7 @@
         </thead>
         <tbody>
           <template v-for="(item, i) in MENU" :key="i">
+
             <!-- CATEGORÍA -->
             <tr
               v-if="item.cat"
@@ -76,6 +77,7 @@
                 </div>
               </td>
             </tr>
+
           </template>
 
           <!-- ══════════════ SECCIÓN CORRIENTE ══════════════ -->
@@ -102,25 +104,47 @@
               :key="'corriente-' + idx"
               class="dish-row dish-row--corriente"
             >
+              <!-- Nombre -->
               <td class="dish-name">
                 <span class="corriente-badge">Corriente</span>
                 {{ item.nombre }}
               </td>
+
+              <!-- Contador — igual que platos normales -->
               <td>
-                <div style="display:flex; align-items:center; justify-content:center; gap:6px;">
-                  <span class="corriente-precio">${{ item.precio.toLocaleString('es-CO') }}</span>
+                <div class="qty-counter">
+                  <button
+                    type="button"
+                    class="qty-btn qty-btn--minus"
+                    @click="updateQtyCorriente(idx, item.unidades.length - 1)"
+                    :disabled="item.unidades.length === 0"
+                  >−</button>
+                  <span class="qty-value">{{ item.unidades.length }}</span>
+                  <button
+                    type="button"
+                    class="qty-btn qty-btn--plus"
+                    @click="updateQtyCorriente(idx, item.unidades.length + 1)"
+                    :disabled="item.unidades.length >= 99"
+                  >+</button>
                 </div>
               </td>
+
+              <!-- Unidades con obs individuales — igual que platos normales -->
               <td class="units-cell">
-                <div class="units-wrapper">
-                  <div class="unit-row">
+                <div v-if="item.unidades.length > 0" class="units-wrapper">
+                  <div
+                    v-for="(unidad, j) in item.unidades"
+                    :key="j"
+                    class="unit-row"
+                  >
+                    <span v-if="item.unidades.length > 1" class="unit-label">{{ j + 1 }}.</span>
                     <button
                       type="button"
                       class="btn-obs"
-                      :class="{ 'btn-obs--active': tieneObs(item.obs) }"
-                      @click="abrirPopupCorriente(idx)"
+                      :class="{ 'btn-obs--active': tieneObs(unidad) }"
+                      @click="abrirPopupCorriente(idx, j)"
                     >
-                      <template v-if="tieneObs(item.obs)">{{ buildObsText(item.obs) }}</template>
+                      <template v-if="tieneObs(unidad)">{{ buildObsText(unidad) }}</template>
                       <template v-else>Observaciones</template>
                     </button>
                   </div>
@@ -252,9 +276,12 @@
         </template>
       </div>
 
-      <div class="popup-footer">
+      <div class="popup-footer proteinas-footer">
+        <button type="button" class="btn-limpiar-proteinas" @click="limpiarTodasProteinas">
+          Limpiar todo
+        </button>
         <span class="proteinas-count">
-          {{ proteinasActivas.size }} proteína{{ proteinasActivas.size !== 1 ? 's' : '' }} activa{{ proteinasActivas.size !== 1 ? 's' : '' }}
+          {{ proteinasActivas.size }} activa{{ proteinasActivas.size !== 1 ? 's' : '' }}
         </span>
         <button type="button" class="btn-submit" @click="cerrarPopupProteinas">Listo ✓</button>
       </div>
@@ -307,6 +334,9 @@
         <span class="popup-plato">
           <template v-if="popup.esCorriente">
             {{ corrienteSelections[popup.itemIndex]?.nombre }} — Corriente
+            <template v-if="corrienteSelections[popup.itemIndex]?.unidades.length > 1">
+              — Unidad {{ popup.unitIndex + 1 }}
+            </template>
           </template>
           <template v-else-if="popup.itemIndex !== null">
             {{ MENU[popup.itemIndex].name }}
@@ -323,7 +353,6 @@
         </div>
 
         <div class="popup-table">
-          <!-- Items del corriente o del plato normal -->
           <template
             v-for="obs in (popup.esCorriente ? OBS_CORRIENTE.items : OBS_POR_PLATO[MENU[popup.itemIndex]?.num]?.items)"
             :key="obs.label"
@@ -414,6 +443,7 @@ const {
   toastVisible, selections,
   corrienteSelections, proteinasActivas,
   toggleProteina, isProteinaActiva,
+  updateQtyCorriente, limpiarTodasProteinas,
   popupProteinas, abrirPopupProteinas, cerrarPopupProteinas,
   popup, popupResumen,
   haySolo, toggleRadio, toggleModo, toggleSelector,
