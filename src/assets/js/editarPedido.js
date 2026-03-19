@@ -1,5 +1,5 @@
 import { ref, reactive } from "vue";
-import { api } from "../api.js";
+import { api } from "./api.js";
 import { MENU, OBS_POR_PLATO } from "./userPedido.js";
 
 export const useEditarPedido = (pedido) => {
