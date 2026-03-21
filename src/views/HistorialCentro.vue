@@ -291,7 +291,7 @@ function imprimirPedido(pedido) {
 
         contenidoTicket += `
           <div class="plato">
-            <span>${nombreBase}${size ? " - " + size : ""}</span>
+            <span>${nombreBase}${size ? " - " + size : ""} -- x1 --</span>
             <span class="Price1">$${precioUnitario.toLocaleString("es-CO")}</span>
           </div>
           ${partes.map((t) => `<div class="obs">${t}</div>`).join("")}
@@ -315,7 +315,7 @@ function imprimirPedido(pedido) {
 
       contenidoTicket += `
         <div class="plato">
-          <span>${p.nombre}${p.size ? " - " + p.size : ""}</span>
+          <span>${p.nombre}${p.size ? " - " + p.size : ""} -- x1 --</span>
           <span class="Price1">$${precioUnitario.toLocaleString("es-CO")}</span>
         </div>
         ${partes.map((t) => `<div class="obs">${t}</div>`).join("")}
@@ -338,7 +338,9 @@ function imprimirPedido(pedido) {
     </html>
   `;
 
-  iframe.contentDocument.write(contenidoTicket + contenidoTicket);
+const paginaCorte = `<div style="page-break-after: always;"></div>`;
+iframe.contentDocument.write(contenidoTicket + paginaCorte + contenidoTicket);
+
   iframe.contentDocument.close();
 
   setTimeout(() => {

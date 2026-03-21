@@ -251,7 +251,7 @@ function imprimirPedido(pedido) {
 
         contenidoTicket += `
           <div class="plato">
-            <span>${nombreBase}${size ? " - " + size : ""}</span>
+            <span>${nombreBase}${size ? " - " + size : ""} -- x1 --</span>
             <span class="Price1">$${precioUnitario.toLocaleString("es-CO")}</span>
           </div>
           ${partes.map((t) => `<div class="obs">${t}</div>`).join("")}
@@ -275,7 +275,7 @@ function imprimirPedido(pedido) {
 
       contenidoTicket += `
         <div class="plato">
-          <span>${p.nombre}${p.size ? " - " + p.size : ""}</span>
+          <span>${p.nombre}${p.size ? " - " + p.size : ""} -- x1 --</span>
           <span class="Price1">$${precioUnitario.toLocaleString("es-CO")}</span>
         </div>
         ${partes.map((t) => `<div class="obs">${t}</div>`).join("")}

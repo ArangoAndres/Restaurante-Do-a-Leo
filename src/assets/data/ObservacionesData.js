@@ -236,6 +236,24 @@ export const OBS_POR_PLATO = {
       { label: "¿No Guiso?", tipo: "radio" },
     ],
   },
+
+  20: {
+    permitirTexto: true,
+    items: [
+      { label: "¿SemiOreada?", tipo: "radio" },
+    
+
+      { label: "¿Solo Francesa?", tipo: "radio" },
+      { label: "Arroz", tipo: "modo" },
+      { label: "Ensalada", tipo: "modo" },
+      { label: "Patacón", tipo: "modo" },
+      { label: "Tajada", tipo: "modo" },
+      { label: "Yuca", tipo: "modo" },
+      { label: "¿No Vinagreta?", tipo: "radio" },
+      { label: "¿No Guiso?", tipo: "radio" },
+    ],
+  },
+
   21: {
     permitirTexto: true,
     items: [
