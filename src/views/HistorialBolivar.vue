@@ -363,7 +363,7 @@ function imprimirPedido(pedido) {
   `;
 
 const paginaCorte = `<div style="page-break-after: always;"></div>`;
-iframe.contentDocument.write(contenidoTicket + paginaCorte + contenidoTicket);
+iframe.contentDocument.write(contenidoTicket);
 
   iframe.contentDocument.close();
 
@@ -401,8 +401,11 @@ onMounted(() => {
 
   if (onNuevoPedido) {
     onNuevoPedido.value = (pedido) => {
-      imprimirPedido(pedido)
-    }
+  imprimirPedido(pedido)
+  setTimeout(() => {
+    imprimirPedido(pedido)
+  }, 1500)
+}
   }
 
 })
