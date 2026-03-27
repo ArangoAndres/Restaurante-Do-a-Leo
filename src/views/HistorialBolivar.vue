@@ -251,6 +251,7 @@ function imprimirPedido(pedido) {
           <p><strong>Tel:</strong> <strong>${pedido.cliente?.telefono || "—"}</strong></p>
         </div>
         <div class="linea"></div>
+             <p class="Hora_tam"><strong>Hora de Entrega:</strong><strong> ${pedido.cliente.hora_entrega}</strong></p>
         <p style="font-size:10px">@@@@@@@@@@@@@@@@@@@@@@@@@@@@@</p>
          <p style="font-size:10px">@@@@@@@@@@@@@@@@@@@@@@@@@@@</p>
   `;

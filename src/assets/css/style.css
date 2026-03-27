@@ -1063,3 +1063,19 @@ table.menu-table {
   align-self: center;
   flex: 1;
 }
+/* Campo Hora de entrega */
+.field input[type="time"] {
+  width: 100%;
+  padding: 10px 12px;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+  font-size: 14px;
+  background: white;
+  transition: 0.2s;
+}
+
+.field input[type="time"]:focus {
+  outline: none;
+  border-color: #4caf50;
+  box-shadow: 0 0 0 2px rgba(76, 175, 80, 0.15);
+}

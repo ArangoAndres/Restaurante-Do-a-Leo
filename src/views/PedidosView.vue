@@ -159,38 +159,74 @@
     </div>
 
     <!-- SECCIÓN 2: DATOS DEL CLIENTE -->
-    <div class="section">
-      <div class="section-header">
-        <div class="section-icon">2</div>
-        <h2>Datos del Cliente</h2>
+   <!-- SECCIÓN 2: DATOS DEL CLIENTE -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-icon">2</div>
+    <h2>Datos del Cliente</h2>
+  </div>
+  <div class="section-body">
+    <div class="grid-2">
+      <div class="field">
+        <label for="nombre">Nombre</label>
+        <input
+          type="text"
+          id="nombre"
+          v-model="form.nombre"
+          placeholder="Ej. Juan García"
+        />
       </div>
-      <div class="section-body">
-        <div class="grid-2">
-          <div class="field">
-            <label for="nombre">Nombre</label>
-            <input type="text" id="nombre" v-model="form.nombre" placeholder="Ej. Juan García" />
-          </div>
-          <div class="field">
-            <label for="telefono">Teléfono</label>
-            <input type="tel" id="telefono" v-model="form.telefono" placeholder="300 123 4567" />
-          </div>
-        </div>
-        <div class="field" v-if="!recogeEnRestaurante">
-          <label for="direccion">Dirección de entrega</label>
-          <input type="text" id="direccion" v-model="form.direccion" placeholder="Calle, número" />
-        </div>
-        <div class="field" v-if="!recogeEnRestaurante">
-          <label for="barrio">Barrio</label>
-          <input type="text" id="barrio" v-model="form.barrio" placeholder="Ej. El Centro, La Esperanza" />
-        </div>
-        <div class="field-check">
-          <label class="check-recoge">
-            <input type="checkbox" v-model="recogeEnRestaurante" />
-            <span>Recoge en restaurante</span>
-          </label>
-        </div>
+
+      <div class="field">
+        <label for="telefono">Teléfono</label>
+        <input
+          type="tel"
+          id="telefono"
+          v-model="form.telefono"
+          placeholder="300 123 4567"
+        />
       </div>
+
+    
+
     </div>
+
+    <div class="field" v-if="!recogeEnRestaurante">
+      <label for="direccion">Dirección de entrega</label>
+      <input
+        type="text"
+        id="direccion"
+        v-model="form.direccion"
+        placeholder="Calle, número"
+      />
+    </div>
+
+    <div class="field" v-if="!recogeEnRestaurante">
+      <label for="barrio">Barrio</label>
+      <input
+        type="text"
+        id="barrio"
+        v-model="form.barrio"
+        placeholder="Ej. El Centro, La Esperanza"
+      />
+    </div>
+  <div class="field">
+        <label for="horaEntrega">Hora de entrega (Opcional)</label>
+        <input
+          type="time"
+          id="horaEntrega"
+          v-model="form.horaEntrega"
+        />
+      </div>
+    <div class="field-check">
+      <label class="check-recoge">
+        <input type="checkbox" v-model="recogeEnRestaurante" />
+        <span>Recoge en restaurante</span>
+      </label>
+    </div>
+
+  </div>
+</div>
 
     <!-- SECCIÓN 3: FORMA DE PAGO -->
     <div class="section">

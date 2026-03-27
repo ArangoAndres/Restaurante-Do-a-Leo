@@ -187,6 +187,7 @@ function imprimirPedido(pedido) {
           <p><strong>Tel:</strong> <strong>${pedido.cliente?.telefono || "—"}</strong></p>
         </div>
         <div class="linea"></div>
+        <p class="Hora_tam"><strong>Hora de Entrega:</strong><strong> ${pedido.cliente.hora_entrega}</strong></p>
         <p style="font-size:10px">@@@@@@@@@@@@@@@@@@@@@@@@@@@@@</p>
          <p style="font-size:10px">@@@@@@@@@@@@@@@@@@@@@@@@@@@</p>
   `;
@@ -341,6 +342,7 @@ setTimeout(() => {
         <p><strong>Celular:</strong> {{ pedido.cliente.telefono }}</p>
         <p><strong>Dirección:</strong> {{ pedido.cliente.direccion }}</p>
         <p><strong>Barrio:</strong>{{pedido.cliente.barrio}}</p>
+        <p><strong>Hora de Entrega:</strong> {{ pedido.cliente.hora_entrega }}</p>
         <p><strong>Forma Pago:</strong> {{ pedido.formaPago }}</p>
         <p>
           <strong>Estado:</strong>

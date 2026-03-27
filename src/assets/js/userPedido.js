@@ -68,7 +68,7 @@ function cargarCorriente() {
 
 // ─── Hook principal ───────────────────────────────────────────
 export function usePedido() {
-  const form = reactive({ nombre: "", telefono: "", direccion: "", barrio: "" });
+  const form = reactive({ nombre: "", telefono: "", direccion: "", barrio: "", horaEntrega: "" });
   const recogeEnRestaurante = ref(false);
   const restauranteSeleccionado = ref("");
   const formaPago = ref("");
@@ -265,6 +265,7 @@ export function usePedido() {
     form.telefono = "";
     form.direccion = "";
     form.barrio = "";
+    form.horaEntrega = "";
     recogeEnRestaurante.value = false;
     restauranteSeleccionado.value = "";
     formaPago.value = "";
@@ -314,6 +315,7 @@ export function usePedido() {
         telefono: form.telefono,
         direccion: recogeEnRestaurante.value ? "Recoge en restaurante" : form.direccion,
         barrio: recogeEnRestaurante.value ? "" : form.barrio,
+        hora_entrega: form.horaEntrega,
       },
       formaPago: formaPago.value,
       restaurante: restauranteSeleccionado.value,
