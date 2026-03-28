@@ -8,7 +8,8 @@ export const useEditarPedido = (pedido) => {
     nombre: pedido.cliente.nombre,
     telefono: pedido.cliente.telefono,
     direccion: pedido.cliente.direccion,
-    barrio: pedido.cliente.barrio ?? "", // ← barrio
+    barrio: pedido.cliente.barrio ?? "",
+    hora_entrega: pedido.cliente.hora_entrega ?? "", // ← NUEVO CAMPO
     formaPago: pedido.formaPago ?? "Efectivo",
   });
 
@@ -43,7 +44,6 @@ export const useEditarPedido = (pedido) => {
     temp: { radios: [], modos: {}, selectores: {}, texto: "" },
   });
 
-  // Helpers
   const haySolo = () =>
     Object.values(popup.temp.modos).some((v) => v === "Solo");
 
@@ -148,13 +148,14 @@ export const useEditarPedido = (pedido) => {
 
     const payload = {
       restaurante: pedido.restaurante,
-      formaPago: form.formaPago === "Efectivo" ? "" : form.formaPago, // ← vacío si efectivo
+      formaPago: form.formaPago === "Efectivo" ? "" : form.formaPago,
       estado: nuevoEstado,
       cliente: {
         nombre: form.nombre,
         telefono: form.telefono,
         direccion: recogeEnRestaurante.value ? "" : form.direccion,
-        barrio: recogeEnRestaurante.value ? "" : form.barrio, // ← barrio
+        barrio: recogeEnRestaurante.value ? "" : form.barrio,
+        hora_entrega: form.hora_entrega || "", // ← NUEVO CAMPO
       },
       platos,
     };
@@ -169,7 +170,7 @@ export const useEditarPedido = (pedido) => {
     }
   };
 
-  // ── UTILIDADES PARA MOSTRAR OBS EN BOTÓN ───────────
+  // ── UTILIDADES ─────────────────────────────────────
   const tieneObs = (obs) => {
     return (
       (obs.radios && obs.radios.length) ||

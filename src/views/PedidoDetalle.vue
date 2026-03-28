@@ -187,7 +187,15 @@ function imprimirPedido(pedido) {
           <p><strong>Tel:</strong> <strong>${pedido.cliente?.telefono || "—"}</strong></p>
         </div>
         <div class="linea"></div>
-        <p class="Hora_tam"><strong>Hora de Entrega:</strong><strong> ${pedido.cliente.hora_entrega}</strong></p>
+<p class="Hora_tam">
+  <strong>Hora de Entrega:</strong>
+  <strong>
+    ${pedido.cliente?.hora_entrega 
+      ? new Date(`1970-01-01T${pedido.cliente.hora_entrega}`)
+          .toLocaleTimeString("es-CO", { hour: "numeric", minute: "2-digit", hour12: true })
+      : "—"}
+  </strong>
+</p>
         <p style="font-size:10px">@@@@@@@@@@@@@@@@@@@@@@@@@@@@@</p>
          <p style="font-size:10px">@@@@@@@@@@@@@@@@@@@@@@@@@@@</p>
   `;
@@ -342,7 +350,15 @@ setTimeout(() => {
         <p><strong>Celular:</strong> {{ pedido.cliente.telefono }}</p>
         <p><strong>Dirección:</strong> {{ pedido.cliente.direccion }}</p>
         <p><strong>Barrio:</strong>{{pedido.cliente.barrio}}</p>
-        <p><strong>Hora de Entrega:</strong> {{ pedido.cliente.hora_entrega }}</p>
+       <p>
+<strong>Hora de Entrega:</strong>
+<strong class="Hora_tam">
+{{ pedido.cliente?.hora_entrega 
+? new Date(`1970-01-01T${pedido.cliente.hora_entrega}`)
+.toLocaleTimeString("es-CO", { hour: "2-digit", minute: "2-digit", hour12: true }) 
+: "—" }}
+</strong>
+</p>
         <p><strong>Forma Pago:</strong> {{ pedido.formaPago }}</p>
         <p>
           <strong>Estado:</strong>

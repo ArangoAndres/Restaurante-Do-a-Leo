@@ -251,7 +251,15 @@ function imprimirPedido(pedido) {
           <p><strong>Tel:</strong> <strong>${pedido.cliente?.telefono || "—"}</strong></p>
         </div>
         <div class="linea"></div>
-             <p class="Hora_tam"><strong>Hora de Entrega:</strong><strong> ${pedido.cliente.hora_entrega}</strong></p>
+             <p class="Hora_tam">
+  <strong>Hora de Entrega:</strong>
+  <strong>
+    ${pedido.cliente?.hora_entrega 
+      ? new Date(`1970-01-01T${pedido.cliente.hora_entrega}`)
+          .toLocaleTimeString("es-CO", { hour: "numeric", minute: "2-digit", hour12: true })
+      : "—"}
+  </strong>
+</p>
         <p style="font-size:10px">@@@@@@@@@@@@@@@@@@@@@@@@@@@@@</p>
          <p style="font-size:10px">@@@@@@@@@@@@@@@@@@@@@@@@@@@</p>
   `;
