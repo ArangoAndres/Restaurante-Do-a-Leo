@@ -227,8 +227,8 @@ function volver() {
           <button
             type="button"
             class="btn-restaurante"
-            :class="{ active: logica.form.modoEntrega === 'Recoger' }"
-            @click="logica.form.modoEntrega = 'Recoger'"
+            :class="{ active: logica.form.modoEntrega === 'Pasar a Recoger' }"
+            @click="logica.form.modoEntrega = 'Pasar a Recoger'"
           >
             <span class="rest-icon">📦</span>
             <span class="rest-name">Pasar a recoger</span>
@@ -237,8 +237,8 @@ function volver() {
           <button
             type="button"
             class="btn-restaurante"
-            :class="{ active: logica.form.modoEntrega === 'Pie' }"
-            @click="logica.form.modoEntrega = 'Pie'"
+            :class="{ active: logica.form.modoEntrega === 'A Pie' }"
+            @click="logica.form.modoEntrega = 'A Pie'"
           >
             <span class="rest-icon">🚶</span>
             <span class="rest-name">A pie</span>
