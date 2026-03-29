@@ -244,9 +244,17 @@ function imprimirPedido(pedido) {
   const limpiar = (txt) => String(txt).replace(/[¿¡?!]/g, "").trim();
 
   // 🔥 MODIFICACION SOPAS
-  const formatearSopa = (nombre, size) => {
+  const formatearSopa = (nombre, size, plato = null) => {
     const nombreUpper = (nombre || "").toUpperCase();
     const sizeUpper = (size || "").toUpperCase();
+
+    // 🔥 SOPA ADICIONAL
+    if (nombreUpper.includes("SOPA ADICIONAL")) {
+      const radio = plato?.observaciones?.radios?.[0];
+      if (radio) {
+        return `${limpiar(radio)}${size ? " - " + size : ""}`;
+      }
+    }
 
     if (nombreUpper.includes("SANCOCHO DE GALLINA") && sizeUpper === "MEDIA") {
       return `MEDIO - ${nombre}`;
@@ -295,7 +303,7 @@ function imprimirPedido(pedido) {
       contenidoTicket += `
         <div class="grupo">
           <div class="titulo-grupo">
-            <span>${formatearSopa(nombreBase,size)}-- x${cantidad} -- </span>
+            <span>${formatearSopa(nombreBase,size,lista[0])}-- x${cantidad} -- </span>
             <span class="Price1">$${subtotalGrupo.toLocaleString("es-CO")}</span>
             </div>
             <div class="linea_grupos"></div>
@@ -320,7 +328,7 @@ function imprimirPedido(pedido) {
         if (partes.length > 0) {
           contenidoTicket += `
             <div class="plato">
-              <span>${formatearSopa(nombreBase,size)} -- x1 --</span>
+              <span>${formatearSopa(nombreBase,size,p)} -- x1 --</span>
               <span class="Price1">$${precioUnitario.toLocaleString("es-CO")}</span>
             </div>
             ${partes.map((t) => `<div class="obs">${t}</div>`).join("")}
@@ -350,7 +358,7 @@ function imprimirPedido(pedido) {
 
       contenidoTicket += `
         <div class="plato">
-          <span>${formatearSopa(p.nombre,p.size)} -- x1 --</span>
+          <span>${formatearSopa(p.nombre,p.size,p)} -- x1 --</span>
           <span class="Price1">$${precioUnitario.toLocaleString("es-CO")}</span>
         </div>
         ${partes.map((t) => `<div class="obs">${t}</div>`).join("")}
@@ -382,11 +390,9 @@ iframe.contentDocument.write(contenidoTicket);
 
     iframe.contentWindow.focus()
 
-    /* 🔔 SONIDO */
     sonidoImprimir.currentTime = 0
     sonidoImprimir.play().catch(() => {})
 
-    /* 🖨 IMPRIMIR */
     iframe.contentWindow.print()
 
     setTimeout(() => {

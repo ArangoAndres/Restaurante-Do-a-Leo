@@ -60,19 +60,43 @@
                     <select v-if="item.sizes.length > 0" class="unit-size" v-model="unidad.size">
                       <option v-for="s in item.sizes" :key="s" :value="s">{{ s }}</option>
                     </select>
+
+                    <!-- Observaciones normales -->
                     <button
                       v-if="OBS_POR_PLATO[item.num] && !(
                         (item.cat === 'SOPAS' || (item.num >= 1 && item.num <= 4)) &&
-                        (unidad.size === 'Solo Sopa' || unidad.size === '9500')
+                        (unidad.size === 'Solo Sopa' || unidad.size === 'Pequeña')
                       )"
                       type="button"
                       class="btn-obs"
                       :class="{ 'btn-obs--active': tieneObs(unidad.obs) }"
                       @click="abrirPopup(i, j)"
                     >
-                      <template v-if="tieneObs(unidad.obs)">{{ buildObsText(unidad.obs) }}</template>
-                      <template v-else>Observaciones</template>
+                      <template v-if="tieneObs(unidad.obs)">
+                        {{ buildObsText(unidad.obs) }}
+                      </template>
+                      <template v-else>
+                        Observaciones
+                      </template>
                     </button>
+
+                    <!-- Solo texto libre para sopa pequeña -->
+                    <div
+                      v-else-if="
+                        (item.cat === 'SOPAS' || (item.num >= 1 && item.num <= 4)) &&
+                        (unidad.size === 'Solo Sopa' || unidad.size === 'Pequeña')
+                      "
+                      class="obs-texto-libre"
+                    >
+                      <input
+                        type="text"
+                        v-model="unidad.obs.texto"
+                        placeholder="Observación..."
+                        class="input-obs"
+                        :class="{ 'input-obs--active': unidad.obs.texto?.trim() }"
+                      />
+                    </div>
+
                   </div>
                 </div>
               </td>
@@ -110,7 +134,7 @@
                 {{ item.nombre }}
               </td>
 
-              <!-- Contador — igual que platos normales -->
+              <!-- Contador -->
               <td>
                 <div class="qty-counter">
                   <button
@@ -129,7 +153,7 @@
                 </div>
               </td>
 
-              <!-- Unidades con obs individuales — igual que platos normales -->
+              <!-- Unidades con obs individuales -->
               <td class="units-cell">
                 <div v-if="item.unidades.length > 0" class="units-wrapper">
                   <div
@@ -159,74 +183,71 @@
     </div>
 
     <!-- SECCIÓN 2: DATOS DEL CLIENTE -->
-   <!-- SECCIÓN 2: DATOS DEL CLIENTE -->
-<div class="section">
-  <div class="section-header">
-    <div class="section-icon">2</div>
-    <h2>Datos del Cliente</h2>
-  </div>
-  <div class="section-body">
-    <div class="grid-2">
-      <div class="field">
-        <label for="nombre">Nombre</label>
-        <input
-          type="text"
-          id="nombre"
-          v-model="form.nombre"
-          placeholder="Ej. Juan García"
-        />
+    <div class="section">
+      <div class="section-header">
+        <div class="section-icon">2</div>
+        <h2>Datos del Cliente</h2>
       </div>
+      <div class="section-body">
+        <div class="grid-2">
+          <div class="field">
+            <label for="nombre">Nombre</label>
+            <input
+              type="text"
+              id="nombre"
+              v-model="form.nombre"
+              placeholder="Ej. Juan García"
+            />
+          </div>
 
-      <div class="field">
-        <label for="telefono">Teléfono</label>
-        <input
-          type="tel"
-          id="telefono"
-          v-model="form.telefono"
-          placeholder="300 123 4567"
-        />
+          <div class="field">
+            <label for="telefono">Teléfono</label>
+            <input
+              type="tel"
+              id="telefono"
+              v-model="form.telefono"
+              placeholder="300 123 4567"
+            />
+          </div>
+        </div>
+
+        <div class="field" v-if="!recogeEnRestaurante">
+          <label for="direccion">Dirección de entrega</label>
+          <input
+            type="text"
+            id="direccion"
+            v-model="form.direccion"
+            placeholder="Calle, número"
+          />
+        </div>
+
+        <div class="field" v-if="!recogeEnRestaurante">
+          <label for="barrio">Barrio</label>
+          <input
+            type="text"
+            id="barrio"
+            v-model="form.barrio"
+            placeholder="Ej. El Centro, La Esperanza"
+          />
+        </div>
+
+        <div class="field">
+          <label for="horaEntrega">Hora de entrega (Opcional)</label>
+          <input
+            type="time"
+            id="horaEntrega"
+            v-model="form.horaEntrega"
+          />
+        </div>
+
+        <div class="field-check">
+          <label class="check-recoge">
+            <input type="checkbox" v-model="recogeEnRestaurante" />
+            <span>Recoge en restaurante</span>
+          </label>
+        </div>
       </div>
-
-    
-
     </div>
-
-    <div class="field" v-if="!recogeEnRestaurante">
-      <label for="direccion">Dirección de entrega</label>
-      <input
-        type="text"
-        id="direccion"
-        v-model="form.direccion"
-        placeholder="Calle, número"
-      />
-    </div>
-
-    <div class="field" v-if="!recogeEnRestaurante">
-      <label for="barrio">Barrio</label>
-      <input
-        type="text"
-        id="barrio"
-        v-model="form.barrio"
-        placeholder="Ej. El Centro, La Esperanza"
-      />
-    </div>
-  <div class="field">
-        <label for="horaEntrega">Hora de entrega (Opcional)</label>
-        <input
-          type="time"
-          id="horaEntrega"
-          v-model="form.horaEntrega"
-        />
-      </div>
-    <div class="field-check">
-      <label class="check-recoge">
-        <input type="checkbox" v-model="recogeEnRestaurante" />
-        <span>Recoge en restaurante</span>
-      </label>
-    </div>
-
-  </div>
-</div>
 
     <!-- SECCIÓN 3: FORMA DE PAGO -->
     <div class="section">
@@ -276,49 +297,46 @@
       </div>
     </div>
 
-<!-- SECCIÓN 5: ENTREGA -->
-<div class="section">
-  <div class="section-header">
-    <div class="section-icon">5</div>
-    <h2>Entrega</h2>
-  </div>
+    <!-- SECCIÓN 5: ENTREGA -->
+    <div class="section">
+      <div class="section-header">
+        <div class="section-icon">5</div>
+        <h2>Entrega</h2>
+      </div>
+      <div class="section-body">
+        <div class="grid-3">
+          <button
+            type="button"
+            class="btn-restaurante"
+            :class="{ active: modoEntrega === 'Moto' }"
+            @click="modoEntrega = 'Moto'"
+          >
+            <span class="rest-icon">🏍</span>
+            <span class="rest-name">Domicilio - Moto</span>
+          </button>
 
-  <div class="section-body">
-    <div class="grid-3">
+          <button
+            type="button"
+            class="btn-restaurante"
+            :class="{ active: modoEntrega === 'Pasar a recoger' }"
+            @click="modoEntrega = 'Pasar a recoger'"
+          >
+            <span class="rest-icon">📦</span>
+            <span class="rest-name">Pasar a recoger</span>
+          </button>
 
-      <button 
-        type="button"
-        class="btn-restaurante"
-        :class="{ active: modoEntrega === 'Moto' }"
-        @click="modoEntrega = 'Moto'"
-      >
-        <span class="rest-icon">🏍</span>
-        <span class="rest-name">Domicilio - Moto</span>
-      </button>
-
-      <button 
-        type="button"
-        class="btn-restaurante"
-        :class="{ active: modoEntrega === 'Pasar a recoger' }"
-        @click="modoEntrega = 'Pasar a recoger'"
-      >
-        <span class="rest-icon">📦</span>
-        <span class="rest-name">Pasar a recoger</span>
-      </button>
-
-      <button 
-        type="button"
-        class="btn-restaurante"
-        :class="{ active: modoEntrega === 'A Pie' }"
-        @click="modoEntrega = 'A Pie'"
-      >
-        <span class="rest-icon">🚶</span>
-        <span class="rest-name">A pie</span>
-      </button>
-
+          <button
+            type="button"
+            class="btn-restaurante"
+            :class="{ active: modoEntrega === 'A Pie' }"
+            @click="modoEntrega = 'A Pie'"
+          >
+            <span class="rest-icon">🚶</span>
+            <span class="rest-name">A pie</span>
+          </button>
+        </div>
+      </div>
     </div>
-  </div>
-</div>
 
     <!-- BOTONES -->
     <div class="submit-area">
@@ -529,7 +547,7 @@ const {
   haySolo, toggleRadio, toggleModo, toggleSelector,
   tieneObs, buildObsText, updateQty,
   abrirPopup, abrirPopupCorriente, cerrarPopup, confirmarPopup,
-  resetForm, abrirResumen, enviarPedidoFinal,modoEntrega
+  resetForm, abrirResumen, enviarPedidoFinal, modoEntrega
 } = usePedido();
 
 // Categorías colapsables

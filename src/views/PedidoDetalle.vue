@@ -209,10 +209,18 @@ function imprimirPedido(pedido) {
     });
   };
 
-  // 🔥 Lógica especial para nombres con tamaño
-  const formatearNombre = (nombre, size) => {
+  // 🔥 Lógica especial nombres
+  const formatearNombre = (nombre, size, plato = null) => {
     const nombreUpper = (nombre || "").toUpperCase();
     const sizeUpper = (size || "").toUpperCase();
+
+    // 🔥 SOPA ADICIONAL
+    if (nombreUpper.includes("SOPA ADICIONAL")) {
+      const radio = plato?.observaciones?.radios?.[0];
+      if (radio) {
+        return `${limpiar(radio)}${size ? " - " + size : ""}`;
+      }
+    }
 
     if (nombreUpper.includes("SANCOCHO DE GALLINA") && sizeUpper === "MEDIA") {
       return `MEDIO - ${nombre}`;
@@ -245,7 +253,7 @@ function imprimirPedido(pedido) {
       contenidoTicket += `
         <div class="grupo">
           <div class="titulo-grupo">
-            <span>${formatearNombre(nombreBase, size)} -- x${cantidad} --</span>
+            <span>${formatearNombre(nombreBase, size, lista[0])} -- x${cantidad} --</span>
             <span class="Price1">$${subtotalGrupo.toLocaleString("es-CO")}</span>
           </div>
           <div class="linea_grupos"></div>
@@ -267,11 +275,10 @@ function imprimirPedido(pedido) {
         if (obs.texto && obs.texto.trim() !== "")
           partes.push(limpiar(obs.texto));
 
-        // 🔥 Solo imprimir si tiene cambios
         if (partes.length > 0) {
           contenidoTicket += `
             <div class="plato">
-              <span>${formatearNombre(nombreBase, size)} -- x1 --</span>
+              <span>${formatearNombre(nombreBase, size, p)} -- x1 --</span>
               <span class="Price1">$${precioUnitario.toLocaleString("es-CO")}</span>
             </div>
             ${partes.map((t) => `<div class="obs">${t}</div>`).join("")}
@@ -297,7 +304,7 @@ function imprimirPedido(pedido) {
 
       contenidoTicket += `
         <div class="plato">
-          <span>${formatearNombre(p.nombre, p.size)} -- x1 --</span>
+          <span>${formatearNombre(p.nombre, p.size, p)} -- x1 --</span>
           <span class="Price1">$${precioUnitario.toLocaleString("es-CO")}</span>
         </div>
         ${partes.map((t) => `<div class="obs">${t}</div>`).join("")}
@@ -326,7 +333,6 @@ function imprimirPedido(pedido) {
   setTimeout(() => {
     iframe.contentWindow.focus();
 
-    // 🔔 Sonido al imprimir
     sonidoImprimir.currentTime = 0;
     sonidoImprimir.play().then(() => {
       setTimeout(() => {
