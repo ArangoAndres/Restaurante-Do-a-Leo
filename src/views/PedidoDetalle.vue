@@ -347,6 +347,7 @@ setTimeout(() => {
 
       <div class="factura-info">
         <p><strong>Hora:</strong> {{ formatHora(pedido.fecha) }}</p>
+        <p><strong>Modo de Entrega:</strong> {{ pedido.modoEntrega || "—" }}</p>
         <p><strong>Nombre:</strong> {{ pedido.cliente.nombre }}</p>
         <p><strong>Celular:</strong> {{ pedido.cliente.telefono }}</p>
         <p><strong>Dirección:</strong> {{ pedido.cliente.direccion }}</p>
