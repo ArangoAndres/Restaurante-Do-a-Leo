@@ -72,6 +72,7 @@ export function usePedido() {
   const recogeEnRestaurante = ref(false);
   const restauranteSeleccionado = ref("");
   const formaPago = ref("");
+  const modoEntrega = ref("");           // ← NUEVO
   const toastVisible = ref(false);
   const selections = reactive(MENU.map(() => []));
 
@@ -269,8 +270,8 @@ export function usePedido() {
     recogeEnRestaurante.value = false;
     restauranteSeleccionado.value = "";
     formaPago.value = "";
+    modoEntrega.value = "";             // ← NUEVO
     MENU.forEach((_, i) => (selections[i] = []));
-    // Mantiene proteínas activas del día, resetea unidades a [] y limpia obs
     corrienteSelections.value = corrienteSelections.value.map((c) => ({
       ...c,
       unidades: [],
@@ -319,6 +320,7 @@ export function usePedido() {
       },
       formaPago: formaPago.value,
       restaurante: restauranteSeleccionado.value,
+      modoEntrega: modoEntrega.value,   // ← NUEVO
       estado: formaPago.value === "Transferencia" ? "Pago pendiente" : "",
       estado_pedido: "Listo",
       razon_cancelacion: null,
@@ -331,6 +333,7 @@ export function usePedido() {
     if (!recogeEnRestaurante.value && !form.direccion) return alert("Ingresa dirección");
     if (!formaPago.value) return alert("Selecciona método de pago");
     if (!restauranteSeleccionado.value) return alert("Selecciona restaurante");
+    if (!modoEntrega.value) return alert("Selecciona modo de entrega"); // ← NUEVO
     const pedido = construirPedido();
     if (!pedido.platos.length) return alert("Agrega al menos un plato");
     popupResumen.pedido = pedido;
@@ -352,6 +355,7 @@ export function usePedido() {
 
   return {
     form, recogeEnRestaurante, restauranteSeleccionado, formaPago,
+    modoEntrega,                        // ← NUEVO
     toastVisible, selections,
     corrienteSelections, proteinasActivas,
     toggleProteina, isProteinaActiva,

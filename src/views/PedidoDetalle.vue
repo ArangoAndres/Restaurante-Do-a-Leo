@@ -178,6 +178,7 @@ function imprimirPedido(pedido) {
         </div>
         <div class="linea"></div>
         <h2>🧾 PEDIDO #${pedido.id || "—"}</h2>
+         <h3> Modo Entrega: ${pedido.modoEntrega || "—"}</h3>
         <div class="linea"></div>
         <div class="info-cliente">
           <p><strong>Hora:</strong> <strong class="Hora_tam">${pedido.fecha ? new Date(pedido.fecha).toLocaleTimeString("es-CO", { hour: "2-digit", minute: "2-digit" }) : "—"}</strong></p>

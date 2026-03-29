@@ -9,8 +9,9 @@ export const useEditarPedido = (pedido) => {
     telefono: pedido.cliente.telefono,
     direccion: pedido.cliente.direccion,
     barrio: pedido.cliente.barrio ?? "",
-    hora_entrega: pedido.cliente.hora_entrega ?? "", // ← NUEVO CAMPO
+    hora_entrega: pedido.cliente.hora_entrega ?? "",
     formaPago: pedido.formaPago ?? "Efectivo",
+    modoEntrega: pedido.modoEntrega ?? "",   
   });
 
   const recogeEnRestaurante = ref(
@@ -149,13 +150,14 @@ export const useEditarPedido = (pedido) => {
     const payload = {
       restaurante: pedido.restaurante,
       formaPago: form.formaPago === "Efectivo" ? "" : form.formaPago,
+      modoEntrega: form.modoEntrega,           // ← NUEVO
       estado: nuevoEstado,
       cliente: {
         nombre: form.nombre,
         telefono: form.telefono,
         direccion: recogeEnRestaurante.value ? "" : form.direccion,
         barrio: recogeEnRestaurante.value ? "" : form.barrio,
-        hora_entrega: form.hora_entrega || "", // ← NUEVO CAMPO
+        hora_entrega: form.hora_entrega || "",
       },
       platos,
     };

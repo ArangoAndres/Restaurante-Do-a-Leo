@@ -51,49 +51,32 @@ function volver() {
 
               <td>
                 <div class="qty-counter">
-
                   <button
                     type="button"
                     class="qty-btn qty-btn--minus"
                     @click="logica.updateQty(i, selections[i].length - 1)"
                     :disabled="selections[i].length === 0"
-                  >
-                  −
-                  </button>
+                  >−</button>
 
-                  <span class="qty-value">
-                    {{ selections[i].length }}
-                  </span>
+                  <span class="qty-value">{{ selections[i].length }}</span>
 
                   <button
                     type="button"
                     class="qty-btn qty-btn--plus"
                     @click="logica.updateQty(i, selections[i].length + 1)"
                     :disabled="selections[i].length >= 99"
-                  >
-                  +
-                  </button>
-
+                  >+</button>
                 </div>
               </td>
 
               <td class="units-cell">
-
-                <div
-                  v-if="selections[i].length > 0"
-                  class="units-wrapper"
-                >
-
+                <div v-if="selections[i].length > 0" class="units-wrapper">
                   <div
                     v-for="(unidad, j) in selections[i]"
                     :key="j"
                     class="unit-row"
                   >
-
-                    <span
-                      v-if="selections[i].length > 1"
-                      class="unit-label"
-                    >
+                    <span v-if="selections[i].length > 1" class="unit-label">
                       {{ j + 1 }}.
                     </span>
 
@@ -102,11 +85,7 @@ function volver() {
                       class="unit-size"
                       v-model="unidad.size"
                     >
-                      <option
-                        v-for="s in item.sizes"
-                        :key="s"
-                        :value="s"
-                      >
+                      <option v-for="s in item.sizes" :key="s" :value="s">
                         {{ s }}
                       </option>
                     </select>
@@ -118,44 +97,31 @@ function volver() {
                       :class="{ 'btn-obs--active': logica.tieneObs(unidad.obs) }"
                       @click="logica.abrirPopup(i, j)"
                     >
-
                       <template v-if="logica.tieneObs(unidad.obs)">
                         {{ logica.buildObsText(unidad.obs) }}
                       </template>
-
-                      <template v-else>
-                        Observaciones
-                      </template>
-
+                      <template v-else>Observaciones</template>
                     </button>
-
                   </div>
-
                 </div>
-
               </td>
 
             </tr>
 
           </template>
         </tbody>
-
       </table>
-
     </div>
 
-    <!-- SECCIÓN 2 CLIENTE -->
+    <!-- SECCIÓN 2: CLIENTE -->
     <div class="section">
-
       <div class="section-header">
         <div class="section-icon">2</div>
         <h2>Datos del Cliente</h2>
       </div>
 
       <div class="section-body">
-
         <div class="grid-2">
-
           <div class="field">
             <label>Nombre</label>
             <input
@@ -173,13 +139,9 @@ function volver() {
               placeholder="3000000000"
             />
           </div>
-
         </div>
 
-        <div
-          v-if="!logica.recogeEnRestaurante.value"
-          class="field"
-        >
+        <div v-if="!logica.recogeEnRestaurante.value" class="field">
           <label>Dirección</label>
           <input
             type="text"
@@ -188,10 +150,7 @@ function volver() {
           />
         </div>
 
-        <div
-          v-if="!logica.recogeEnRestaurante.value"
-          class="field"
-        >
+        <div v-if="!logica.recogeEnRestaurante.value" class="field">
           <label>Barrio</label>
           <input
             type="text"
@@ -200,103 +159,104 @@ function volver() {
           />
         </div>
 
-
-        <!-- NUEVO CAMPO HORA ENTREGA -->
-        <div
-          v-if="!logica.recogeEnRestaurante.value"
-          class="field"
-        >
+        <div v-if="!logica.recogeEnRestaurante.value" class="field">
           <label>Hora de Entrega</label>
-          <input
-            type="time"
-            v-model="logica.form.hora_entrega"
-          />
+          <input type="time" v-model="logica.form.hora_entrega" />
         </div>
-
 
         <div class="field-check">
           <label class="check-recoge">
-
-            <input
-              type="checkbox"
-              v-model="logica.recogeEnRestaurante.value"
-            />
-
-            <span>
-              Recoge en restaurante
-            </span>
-
+            <input type="checkbox" v-model="logica.recogeEnRestaurante.value" />
+            <span>Recoge en restaurante</span>
           </label>
         </div>
+      </div>
+    </div>
 
+    <!-- SECCIÓN 3: FORMA DE PAGO -->
+    <div class="section">
+      <div class="section-header">
+        <div class="section-icon">3</div>
+        <h2>Forma de Pago</h2>
       </div>
 
+      <div class="section-body">
+        <div class="grid-2">
+          <button
+            type="button"
+            class="btn-restaurante"
+            :class="{ active: logica.form.formaPago === 'Efectivo' }"
+            @click="logica.form.formaPago = 'Efectivo'"
+          >
+            <span class="rest-icon">💵</span>
+            <span class="rest-name">Efectivo</span>
+          </button>
+
+          <button
+            type="button"
+            class="btn-restaurante"
+            :class="{ active: logica.form.formaPago === 'Transferencia' }"
+            @click="logica.form.formaPago = 'Transferencia'"
+          >
+            <span class="rest-icon">📲</span>
+            <span class="rest-name">Transferencia</span>
+          </button>
+        </div>
+      </div>
     </div>
 
+    <!-- SECCIÓN 4: ENTREGA -->
+    <div class="section">
+      <div class="section-header">
+        <div class="section-icon">4</div>
+        <h2>Entrega</h2>
+      </div>
 
-    <!-- FORMA DE PAGO -->
-<!-- SECCIÓN 3: FORMA DE PAGO -->
-<div class="section">
-  <div class="section-header">
-    <div class="section-icon">3</div>
-    <h2>Forma de Pago</h2>
-  </div>
+      <div class="section-body">
+        <div class="grid-3">
+          <button
+            type="button"
+            class="btn-restaurante"
+            :class="{ active: logica.form.modoEntrega === 'Moto' }"
+            @click="logica.form.modoEntrega = 'Moto'"
+          >
+            <span class="rest-icon">🏍</span>
+            <span class="rest-name">Domicilio - Moto</span>
+          </button>
 
-  <div class="section-body">
-    <div class="grid-2">
+          <button
+            type="button"
+            class="btn-restaurante"
+            :class="{ active: logica.form.modoEntrega === 'Recoger' }"
+            @click="logica.form.modoEntrega = 'Recoger'"
+          >
+            <span class="rest-icon">📦</span>
+            <span class="rest-name">Pasar a recoger</span>
+          </button>
 
-      <button
-        type="button"
-        class="btn-restaurante"
-        :class="{ active: logica.form.formaPago === 'Efectivo' }"
-        @click="logica.form.formaPago = 'Efectivo'"
-      >
-        <span class="rest-icon">💵</span>
-        <span class="rest-name">Efectivo</span>
-      </button>
-
-      <button
-        type="button"
-        class="btn-restaurante"
-        :class="{ active: logica.form.formaPago === 'Transferencia' }"
-        @click="logica.form.formaPago = 'Transferencia'"
-      >
-        <span class="rest-icon">📲</span>
-        <span class="rest-name">Transferencia</span>
-      </button>
-
+          <button
+            type="button"
+            class="btn-restaurante"
+            :class="{ active: logica.form.modoEntrega === 'Pie' }"
+            @click="logica.form.modoEntrega = 'Pie'"
+          >
+            <span class="rest-icon">🚶</span>
+            <span class="rest-name">A pie</span>
+          </button>
+        </div>
+      </div>
     </div>
-  </div>
-</div>
-
 
     <!-- BOTONES -->
     <div class="submit-area">
-
-      <button
-        class="btn-reset"
-        @click="volver"
-      >
-        Cancelar
-      </button>
-
-      <button
-        class="btn-submit"
-        @click="logica.guardarCambios"
-      >
-        Guardar Cambios
-      </button>
-
+      <button class="btn-reset" @click="volver">Cancelar</button>
+      <button class="btn-submit" @click="logica.guardarCambios">Guardar Cambios</button>
     </div>
 
   </div>
 
-
   <!-- TOAST -->
-  <div
-    class="toast"
-    :class="{visible: logica?.toastVisible.value}"
-  >
+  <div class="toast" :class="{ visible: logica?.toastVisible.value }">
     Pedido actualizado correctamente
   </div>
 

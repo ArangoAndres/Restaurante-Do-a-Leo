@@ -10,7 +10,7 @@
       >
         <div class="pedido-card-header">
           <span class="pedido-direccion">
-            {{ pedido.cliente?.direccion }}
+           PEDIDO #{{ pedido.id }}
           </span>
         </div>
 

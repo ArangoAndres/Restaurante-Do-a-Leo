@@ -276,6 +276,50 @@
       </div>
     </div>
 
+<!-- SECCIÓN 5: ENTREGA -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-icon">5</div>
+    <h2>Entrega</h2>
+  </div>
+
+  <div class="section-body">
+    <div class="grid-3">
+
+      <button 
+        type="button"
+        class="btn-restaurante"
+        :class="{ active: modoEntrega === 'Moto' }"
+        @click="modoEntrega = 'Moto'"
+      >
+        <span class="rest-icon">🏍</span>
+        <span class="rest-name">Domicilio - Moto</span>
+      </button>
+
+      <button 
+        type="button"
+        class="btn-restaurante"
+        :class="{ active: modoEntrega === 'Pasar a recoger' }"
+        @click="modoEntrega = 'Pasar a recoger'"
+      >
+        <span class="rest-icon">📦</span>
+        <span class="rest-name">Pasar a recoger</span>
+      </button>
+
+      <button 
+        type="button"
+        class="btn-restaurante"
+        :class="{ active: modoEntrega === 'A Pie' }"
+        @click="modoEntrega = 'A Pie'"
+      >
+        <span class="rest-icon">🚶</span>
+        <span class="rest-name">A pie</span>
+      </button>
+
+    </div>
+  </div>
+</div>
+
     <!-- BOTONES -->
     <div class="submit-area">
       <button type="button" class="btn-reset" @click="resetForm">Limpiar</button>
@@ -485,7 +529,7 @@ const {
   haySolo, toggleRadio, toggleModo, toggleSelector,
   tieneObs, buildObsText, updateQty,
   abrirPopup, abrirPopupCorriente, cerrarPopup, confirmarPopup,
-  resetForm, abrirResumen, enviarPedidoFinal,
+  resetForm, abrirResumen, enviarPedidoFinal,modoEntrega
 } = usePedido();
 
 // Categorías colapsables
