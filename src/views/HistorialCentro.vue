@@ -14,7 +14,7 @@
       >
         <div class="pedido-card-header">
           <span class="pedido-direccion">
-            {{ pedido.cliente?.direccion }}
+           PEDIDO # {{ pedido.id }}
           </span>
         </div>
 
@@ -182,9 +182,6 @@ function imprimirPedido(pedido) {
             font-size: 12px;
             text-transform: uppercase;
           }
-          .linea_grupos{
-            border-top: 1px solid black;}
-
           .info-cliente {
             font-size: 14px;
             text-transform: uppercase;
@@ -195,6 +192,9 @@ function imprimirPedido(pedido) {
             width: 100%;
             max-width: 70mm;
           }
+          .linea_grupos{
+            border-top: 1px solid black;
+          }
           .total-final {
             font-weight: bold;
             font-size: 15px;
@@ -203,9 +203,9 @@ function imprimirPedido(pedido) {
             border-top: 1px dashed black;
             padding-top: 5px;
           }
-             .Hora_tam{
+          .Hora_tam{
             font-size:20px;
-            }
+          }
         </style>
       </head>
       <body>
@@ -228,7 +228,7 @@ function imprimirPedido(pedido) {
           <p><strong>Tel:</strong> <strong>${pedido.cliente?.telefono || "—"}</strong></p>
         </div>
         <div class="linea"></div>
-            <p class="Hora_tam">
+             <p class="Hora_tam">
   <strong>Hora de Entrega:</strong>
   <strong>
     ${pedido.cliente?.hora_entrega 
@@ -242,6 +242,22 @@ function imprimirPedido(pedido) {
   `;
 
   const limpiar = (txt) => String(txt).replace(/[¿¡?!]/g, "").trim();
+
+  // 🔥 MODIFICACION SOPAS
+  const formatearSopa = (nombre, size) => {
+    const nombreUpper = (nombre || "").toUpperCase();
+    const sizeUpper = (size || "").toUpperCase();
+
+    if (nombreUpper.includes("SANCOCHO DE GALLINA") && sizeUpper === "MEDIA") {
+      return `MEDIO - ${nombre}`;
+    }
+
+    if (nombreUpper.includes("S. ARROZ CON GALLINA") && sizeUpper === "MEDIA") {
+      return `${nombre}`;
+    }
+
+    return `${nombre}${size ? " - " + size : ""}`;
+  };
 
   const procesarModos = (modos, partes) => {
     Object.entries(modos).forEach(([ing, sim]) => {
@@ -277,10 +293,9 @@ function imprimirPedido(pedido) {
 
     if (cantidad > 1) {
       contenidoTicket += `
-         <div class="grupo">
+        <div class="grupo">
           <div class="titulo-grupo">
-            <span>${nombreBase}${size ? " - " + size : ""}-- x${cantidad} -- </span>
-           
+            <span>${formatearSopa(nombreBase,size)}-- x${cantidad} -- </span>
             <span class="Price1">$${subtotalGrupo.toLocaleString("es-CO")}</span>
             </div>
             <div class="linea_grupos"></div>
@@ -292,20 +307,25 @@ function imprimirPedido(pedido) {
 
         if (Array.isArray(obs.radios) && obs.radios.length > 0)
           obs.radios.forEach((r) => partes.push(limpiar(r)));
+
         if (obs.modos && Object.keys(obs.modos).length > 0)
           procesarModos(obs.modos, partes);
+
         if (obs.selectores && Object.keys(obs.selectores).length > 0)
           procesarSelectores(obs.selectores, partes);
-        if (obs.texto && obs.texto.trim() !== "") partes.push(limpiar(obs.texto));
-        if (partes.length === 0) partes.push("-");
 
-        contenidoTicket += `
-          <div class="plato">
-            <span>${nombreBase}${size ? " - " + size : ""} -- x1 --</span>
-            <span class="Price1">$${precioUnitario.toLocaleString("es-CO")}</span>
-          </div>
-          ${partes.map((t) => `<div class="obs">${t}</div>`).join("")}
-        `;
+        if (obs.texto && obs.texto.trim() !== "")
+          partes.push(limpiar(obs.texto));
+
+        if (partes.length > 0) {
+          contenidoTicket += `
+            <div class="plato">
+              <span>${formatearSopa(nombreBase,size)} -- x1 --</span>
+              <span class="Price1">$${precioUnitario.toLocaleString("es-CO")}</span>
+            </div>
+            ${partes.map((t) => `<div class="obs">${t}</div>`).join("")}
+          `;
+        }
       });
 
       contenidoTicket += `</div><div class="linea"></div>`;
@@ -316,16 +336,21 @@ function imprimirPedido(pedido) {
 
       if (Array.isArray(obs.radios) && obs.radios.length > 0)
         obs.radios.forEach((r) => partes.push(limpiar(r)));
+
       if (obs.modos && Object.keys(obs.modos).length > 0)
         procesarModos(obs.modos, partes);
+
       if (obs.selectores && Object.keys(obs.selectores).length > 0)
         procesarSelectores(obs.selectores, partes);
-      if (obs.texto && obs.texto.trim() !== "") partes.push(limpiar(obs.texto));
+
+      if (obs.texto && obs.texto.trim() !== "")
+        partes.push(limpiar(obs.texto));
+
       if (partes.length === 0) partes.push("-");
 
       contenidoTicket += `
         <div class="plato">
-          <span>${p.nombre}${p.size ? " - " + p.size : ""} -- x1 --</span>
+          <span>${formatearSopa(p.nombre,p.size)} -- x1 --</span>
           <span class="Price1">$${precioUnitario.toLocaleString("es-CO")}</span>
         </div>
         ${partes.map((t) => `<div class="obs">${t}</div>`).join("")}

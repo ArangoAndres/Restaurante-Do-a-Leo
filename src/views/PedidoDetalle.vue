@@ -115,16 +115,9 @@ function imprimirPedido(pedido) {
             font-weight: bold;
             font-size: 20px;
           }
-          .linea {
-            border-top: 1px dashed black;
-          }
-            .linea_grupos{
-            border-top: 1px solid black;}
-
-          .grupo {
-            margin-top: 5px;
-            margin-bottom: 5px;
-          }
+          .linea { border-top: 1px dashed black; }
+          .linea_grupos { border-top: 1px solid black; }
+          .grupo { margin-top: 5px; margin-bottom: 5px; }
           .titulo-grupo {
             font-weight: bold;
             font-size: 15px;
@@ -138,9 +131,7 @@ function imprimirPedido(pedido) {
             display: flex;
             text-transform: uppercase;
           }
-          .plato .Price1 {
-            margin-left: 17px;
-          }
+          .plato .Price1 { margin-left: 17px; }
           .obs {
             font-size: 12px;
             text-transform: uppercase;
@@ -163,9 +154,7 @@ function imprimirPedido(pedido) {
             border-top: 1px dashed black;
             padding-top: 5px;
           }
-            .Hora_tam{
-            font-size:20px;
-            }
+          .Hora_tam { font-size: 20px; }
         </style>
       </head>
       <body>
@@ -178,7 +167,7 @@ function imprimirPedido(pedido) {
         </div>
         <div class="linea"></div>
         <h2>🧾 PEDIDO #${pedido.id || "—"}</h2>
-         <h3> Modo Entrega: ${pedido.modoEntrega || "—"}</h3>
+        <h3>Modo Entrega: ${pedido.modoEntrega || "—"}</h3>
         <div class="linea"></div>
         <div class="info-cliente">
           <p><strong>Hora:</strong> <strong class="Hora_tam">${pedido.fecha ? new Date(pedido.fecha).toLocaleTimeString("es-CO", { hour: "2-digit", minute: "2-digit" }) : "—"}</strong></p>
@@ -188,17 +177,17 @@ function imprimirPedido(pedido) {
           <p><strong>Tel:</strong> <strong>${pedido.cliente?.telefono || "—"}</strong></p>
         </div>
         <div class="linea"></div>
-<p class="Hora_tam">
-  <strong>Hora de Entrega:</strong>
-  <strong>
-    ${pedido.cliente?.hora_entrega 
-      ? new Date(`1970-01-01T${pedido.cliente.hora_entrega}`)
-          .toLocaleTimeString("es-CO", { hour: "numeric", minute: "2-digit", hour12: true })
-      : "—"}
-  </strong>
-</p>
+        <p class="Hora_tam">
+          <strong>Hora de Entrega:</strong>
+          <strong>
+            ${pedido.cliente?.hora_entrega
+              ? new Date(`1970-01-01T${pedido.cliente.hora_entrega}`)
+                  .toLocaleTimeString("es-CO", { hour: "numeric", minute: "2-digit", hour12: true })
+              : "—"}
+          </strong>
+        </p>
         <p style="font-size:10px">@@@@@@@@@@@@@@@@@@@@@@@@@@@@@</p>
-         <p style="font-size:10px">@@@@@@@@@@@@@@@@@@@@@@@@@@@</p>
+        <p style="font-size:10px">@@@@@@@@@@@@@@@@@@@@@@@@@@@</p>
   `;
 
   const limpiar = (txt) => String(txt).replace(/[¿¡?!]/g, "").trim();
@@ -214,9 +203,26 @@ function imprimirPedido(pedido) {
 
   const procesarSelectores = (selectores, partes) => {
     Object.entries(selectores).forEach(([k, v]) => {
-      if (Array.isArray(v)) v.forEach((val) => partes.push(`${limpiar(val)} ${limpiar(k)}`));
+      if (Array.isArray(v))
+        v.forEach((val) => partes.push(`${limpiar(val)} ${limpiar(k)}`));
       else partes.push(`${limpiar(String(v))} ${limpiar(k)}`);
     });
+  };
+
+  // 🔥 Lógica especial para nombres con tamaño
+  const formatearNombre = (nombre, size) => {
+    const nombreUpper = (nombre || "").toUpperCase();
+    const sizeUpper = (size || "").toUpperCase();
+
+    if (nombreUpper.includes("SANCOCHO DE GALLINA") && sizeUpper === "MEDIA") {
+      return `MEDIO - ${nombre}`;
+    }
+
+    if (nombreUpper.includes("S. ARROZ CON GALLINA") && sizeUpper === "MEDIA") {
+      return `${nombre}`;
+    }
+
+    return `${nombre}${size ? " - " + size : ""}`;
   };
 
   const grupos = {};
@@ -239,11 +245,10 @@ function imprimirPedido(pedido) {
       contenidoTicket += `
         <div class="grupo">
           <div class="titulo-grupo">
-            <span>${nombreBase}${size ? " - " + size : ""}-- x${cantidad} -- </span>
-           
+            <span>${formatearNombre(nombreBase, size)} -- x${cantidad} --</span>
             <span class="Price1">$${subtotalGrupo.toLocaleString("es-CO")}</span>
-            </div>
-            <div class="linea_grupos"></div>
+          </div>
+          <div class="linea_grupos"></div>
       `;
 
       lista.forEach((p) => {
@@ -252,20 +257,26 @@ function imprimirPedido(pedido) {
 
         if (Array.isArray(obs.radios) && obs.radios.length > 0)
           obs.radios.forEach((r) => partes.push(limpiar(r)));
+
         if (obs.modos && Object.keys(obs.modos).length > 0)
           procesarModos(obs.modos, partes);
+
         if (obs.selectores && Object.keys(obs.selectores).length > 0)
           procesarSelectores(obs.selectores, partes);
-        if (obs.texto && obs.texto.trim() !== "") partes.push(limpiar(obs.texto));
-        if (partes.length === 0) partes.push("-");
 
-        contenidoTicket += `
-          <div class="plato">
-            <span>${nombreBase}${size ? " - " + size : ""} -- x1 --</span>
-            <span class="Price1">$${precioUnitario.toLocaleString("es-CO")}</span>
-          </div>
-          ${partes.map((t) => `<div class="obs">${t}</div>`).join("")}
-        `;
+        if (obs.texto && obs.texto.trim() !== "")
+          partes.push(limpiar(obs.texto));
+
+        // 🔥 Solo imprimir si tiene cambios
+        if (partes.length > 0) {
+          contenidoTicket += `
+            <div class="plato">
+              <span>${formatearNombre(nombreBase, size)} -- x1 --</span>
+              <span class="Price1">$${precioUnitario.toLocaleString("es-CO")}</span>
+            </div>
+            ${partes.map((t) => `<div class="obs">${t}</div>`).join("")}
+          `;
+        }
       });
 
       contenidoTicket += `</div><div class="linea"></div>`;
@@ -280,56 +291,54 @@ function imprimirPedido(pedido) {
         procesarModos(obs.modos, partes);
       if (obs.selectores && Object.keys(obs.selectores).length > 0)
         procesarSelectores(obs.selectores, partes);
-      if (obs.texto && obs.texto.trim() !== "") partes.push(limpiar(obs.texto));
+      if (obs.texto && obs.texto.trim() !== "")
+        partes.push(limpiar(obs.texto));
       if (partes.length === 0) partes.push("-");
 
       contenidoTicket += `
         <div class="plato">
-          <span>${p.nombre}${p.size ? " - " + p.size : ""} -- x1 --</span>
+          <span>${formatearNombre(p.nombre, p.size)} -- x1 --</span>
           <span class="Price1">$${precioUnitario.toLocaleString("es-CO")}</span>
         </div>
         ${partes.map((t) => `<div class="obs">${t}</div>`).join("")}
         <div class="linea"></div>
-    
       `;
     }
   });
 
   contenidoTicket += `
-<p style="font-size:10px">@@@@@@@@@@@@@@@@@@@@@@@@@@@</p>
-<p style="font-size:10px">@@@@@@@@@@@@@@@@@@@@@@@@@@@@@</p>
-        <div class="total-final">TOTAL: $${totalPedido.toLocaleString("es-CO")}</div>
-        <div>
-          <p>Método de Pago: ${pedido.formaPago}</p>
-          <p>Estado del Pago: ${pedido.estado}</p>
-          <p>-</p>
-          <p><strong>¡GRACIAS POR SU COMPRA!</strong></p>
-        </div>
-      </body>
-    </html>
+    <p style="font-size:10px">@@@@@@@@@@@@@@@@@@@@@@@@@@@</p>
+    <p style="font-size:10px">@@@@@@@@@@@@@@@@@@@@@@@@@@@@@</p>
+    <div class="total-final">TOTAL: $${totalPedido.toLocaleString("es-CO")}</div>
+    <div>
+      <p>Método de Pago: ${pedido.formaPago}</p>
+      <p>Estado del Pago: ${pedido.estado}</p>
+      <p>-</p>
+      <p><strong>¡GRACIAS POR SU COMPRA!</strong></p>
+    </div>
+  </body>
+</html>
   `;
 
   iframe.contentDocument.write(contenidoTicket);
   iframe.contentDocument.close();
 
-setTimeout(() => {
-  iframe.contentWindow.focus();
+  setTimeout(() => {
+    iframe.contentWindow.focus();
 
-  // 🔔 sonido
-  sonidoImprimir.currentTime = 0;
+    // 🔔 Sonido al imprimir
+    sonidoImprimir.currentTime = 0;
+    sonidoImprimir.play().then(() => {
+      setTimeout(() => {
+        sonidoImprimir.pause();
+        sonidoImprimir.currentTime = 0;
+      }, 4000);
+    });
 
-  sonidoImprimir.play().then(() => {
-    setTimeout(() => {
-      sonidoImprimir.pause();
-      sonidoImprimir.currentTime = 0;
-    }, 4000);
-  });
+    iframe.contentWindow.print();
 
-  iframe.contentWindow.print();
-
-  setTimeout(() => document.body.removeChild(iframe), 1000);
-
-}, 300);
+    setTimeout(() => document.body.removeChild(iframe), 1000);
+  }, 300);
 }
 </script>
 
